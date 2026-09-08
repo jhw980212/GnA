@@ -1,6 +1,48 @@
 # DO NOT EDIT, GENERATED AUTOMATICALLY
 
 # ── International papers ────────────────────────────────────────────────
+- id: doi:10.3390/nu18152450
+  title: "Enhancing Exercise Performance with Natural Products: A Comprehensive Review"
+  authors:
+    - Amama Rani
+    - Sojin Kang
+    - Sojin Kim
+    - Jung-Hyun Kim
+    - Jimin Kim
+    - Muhammad Alaa Eldeen
+    - Eunbin Ko
+    - Chanju Im
+    - Moon Nyeo Park
+    - Yunju Jeong
+    - Byung-Kwan Seo
+    - Hyun Chul Jung
+    - Bonglee Kim
+  publisher: Nutrients
+  year: 2026
+  date: "2026-07-27"
+  link: https://doi.org/10.3390/nu18152450
+  kind: paper
+  region: international
+  status: published
+  image: "images/publications/nutrients.webp"
+
+- id: doi:10.1088/1361-6579/ae76b8
+  title: "Validation of a Novel Multi-Sensor Wearable for Measuring Heart Rate, Steps, and Energy Expenditure in Laboratory and Simulated Free-Living Protocols"
+  authors:
+    - TaeEung Kim
+    - Hyun Chul Jung
+    - Yoonjung Bae
+    - Minsoo Kang
+    - Sukho Lee
+  publisher: Physiological Measurement
+  year: 2026
+  date: "2026-06-23"
+  link: https://doi.org/10.1088/1361-6579/ae76b8
+  kind: paper
+  region: international
+  status: published
+  image: "images/publications/ipem.gif"
+
 - id: doi:10.1080/00222895.2026.2652266
   title: "Higher Visual Reliance During Single-Leg Balance in Female Dancers: Traditional Center-of-Pressure and Time-to-Boundary Approaches"
   authors:
@@ -365,7 +407,40 @@
   status: in_press
   image: "images/publications/Journal of Affective Disorders.gif"
 
-# ── Domestic papers (예시 자리, 나중에 채우세요) ───────────────────────────
+# ── Domestic papers ───────────────────────────
+- id: doi:10.24985/kjss.2026.37.2.334
+  title: "근전도 기반 근육 간 결합 및 근육 네트워크 분석: 서술적 고찰"
+  authors:
+    - 박태영
+    - 박경모
+    - 김영미
+    - 김지민
+    - 정현철
+  publisher: 체육과학연구
+  year: 2026
+  date: "2026-06-30"
+  link: https://doi.org/10.24985/kjss.2026.37.2.334
+  kind: paper
+  region: domestic
+  status: published
+  image: "images/publications/한국스포츠과학원.jpg"
+
+- id: doi:10.23949/kjpe.2026.7.65.4.31
+  title: "시각 제한이 노인 여성의 자세 제어 시 근 활성도 및 근육 간 코히런스에 미치는 영향"
+  authors:
+    - 김지민
+    - 박태영
+    - 김영미
+    - 정현철
+  publisher: 한국체육학회지
+  year: 2026
+  date: "2026-07"
+  link: https://doi.org/10.23949/kjpe.2026.7.65.4.31
+  kind: paper
+  region: domestic
+  status: published
+  image: "images/publications/한국체육학회.png"
+
 - id: doi:10.22997/jcses.2026.24.1.123
   title: "건강한 성인의 성별에 따른 대퇴골 무릎 관절 연골 두께와 드롭랜딩 후 회복 반응 비교"
   authors:

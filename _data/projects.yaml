@@ -1,5 +1,22 @@
 # 상태값: ongoing | completed
 - status: ongoing
+  logo: "images/projects/한국콘텐츠진흥원.png"
+  title: "지능형 스포츠마일리지 기반 개인 맞춤형 운동추천관리 서비스 기술 개발 및 리빙랩 실증"
+  sponsor: "경희대학교"
+  period: "2026.04.01 - 2028.12.31"
+  role: "co_pi"
+  prof: "정현철"
+
+- status: ongoing
+  logo: "images/projects/한국콘텐츠진흥원.png"
+  title: "스포츠 AI 코칭 서비스 기술 개발"
+  sponsor: "경희대학교"
+  period: 2026. 04.01 - 2028.12.31"
+  role: "co_pi"
+  prof: "정현철"
+
+
+- status: ongoing
   logo: "images/projects/경희대학교.jpg"
   title: "[2025-1 융·복합 국제공동연구] 8주간의 현대무용이 <br>노인 여성의 낙상 위험 요인 및 근육 네트워크에 미치는 영향"
   sponsor: "경희대학교"
