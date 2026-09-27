@@ -1,5 +1,6 @@
 ---
 layout: home
+title: Growth and Aging Lab
 description: Exercise physiology research on growth, aging, cardiovascular function, and athletic performance at Kyung Hee University.
 ---
 

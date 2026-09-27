@@ -1,4 +1,10 @@
-{%- assign document_name = page.title | default: page.name | default: site.title | strip_html -%}
+{%- if page.url == '/' -%}
+  {%- assign document_name = site.title | strip_html -%}
+{%- elsif page.collection == 'members' -%}
+  {%- assign document_name = page.title | default: page.name | default: site.title | strip_html -%}
+{%- else -%}
+  {%- assign document_name = page.title | default: site.title | strip_html -%}
+{%- endif -%}
 {%- assign document_description = page.description | default: site.description | strip_html | strip_newlines | strip -%}
 {%- assign document_url = page.url | absolute_url -%}
 {%- assign share_image = page.image | default: '/images/web_icon.jpg' | absolute_url -%}
