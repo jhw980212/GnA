@@ -3,12 +3,7 @@
 # ============================================
 title: "Growth and Aging Lab"
 subtitle: "Exercise Physiology"
-description: "Research on exercise physiology, aging, and data-driven analysis."
-header: "images/background2.jpg"
-footer: "images/background2.jpg"
-
-proofer: false
-
+description: "Exercise physiology research on growth, aging, cardiovascular function, and athletic performance at Kyung Hee University."
 # GitHub Pages deployment settings
 url: "https://galab.khu.ac.kr"
 baseurl: ""
@@ -20,7 +15,6 @@ links:
   email: "jhc@khu.ac.kr"
   orcid: "0000-0002-3465-8965"
   google-scholar: "https://scholar.google.com/citations?user=qm1Ao-oAAAAJ&hl=ko&oi=ao"
-  youtube: "YourLabChannel"
 
 # ============================================
 # COLLECTIONS & DEFAULTS
@@ -96,19 +90,15 @@ plugins:
 theme: null   # 로컬 커스텀 테마 사용
 
 # ============================================
-# SASS & ASSET PIPELINE
+# STATIC ASSETS
 # ============================================
-sass:
-  sass_dir: _styles
-
 include:
   - _styles
   - _scripts
 
 exclude:
+  - .preview
   - README.md
-  - LICENSE.md
-  - CITATION.cff
   - Gemfile
   - Gemfile.lock
   - vendor

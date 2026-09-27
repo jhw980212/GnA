@@ -1,51 +1,8 @@
 ---
 layout: default
 ---
-
-{% capture floatcontent %}
-
-{% include portrait.html lookup=page.slug %}
-
-<div>
-  {% for link in page.links %}
-    {% assign key = link[0] %}
-    {% assign value = link[1] %}
-    {% include button.html type=key link=value style="bare" %}<br>
-  {% endfor %}
-</div>
-
-{% endcapture %}
-
-{% include float.html content=floatcontent %}
-
-{{ content }}
-
-{% assign aliases = page.aliases
-  | default: page.name
-  | default: page.title
-  | join: ","
-  | split: ","
-  | array_filter
-%}
-
-{% capture search -%}
-  research/?search={% for alias in aliases %}"{{ alias }}" {% endfor %}
-{%- endcapture %}
-
-<p class="center">
-  <a href="{{ search | relative_url | uri_escape }}">
-    Search for {{ page.name | default: page.title }}'s papers on the Research page
-  </a>
-</p>
-
-{% capture search -%}
-  blog/?search={{ page.name }}
-{%- endcapture %}
-
-<!--
-<p class="center">
-  <a href="{{ search | relative_url | uri_escape }}">
-    See {{ page.name | default: page.title }}'s posts on the Blog page
-  </a>
-</p>
--->
+<a class="back-link" href="{{ '/team/' | relative_url }}">← Meet the team</a>
+<article class="member-profile">
+  <div class="member-profile-photo"><img src="{{ page.image | relative_url | uri_escape }}" alt="{{ page.name | escape }}"></div>
+  <div class="member-profile-info"><p class="eyebrow">Growth & Aging Lab / {% if page.role_label %}{{ page.role_label }}{% else %}{{ page.role | capitalize }}{% endif %}</p><h1>{{ page.name | split: ' (' | first }}</h1>{% if page.name contains '(' %}<p class="profile-name-en">{{ page.name | split: '(' | last | remove: ')' }}</p>{% endif %}{% if page.institution %}<div class="profile-block"><h2>Institution</h2><p>{{ page.institution }}</p></div>{% endif %}{% if page.program %}<div class="profile-block"><h2>Program</h2><p>{{ page.program }}</p></div>{% endif %}{% if page.affiliation %}<div class="profile-block"><h2>Education</h2><p>{{ page.affiliation | remove: 'Education: ' }}</p></div>{% endif %}{% if page.interest %}<div class="profile-block"><h2>Research interests</h2><p>{{ page.interest | remove: 'Research interest: ' }}</p></div>{% endif %}{{ content }}<a class="text-link" href="{{ '/research/' | relative_url }}">Explore our publications <span aria-hidden="true">↗</span></a></div>
+</article>

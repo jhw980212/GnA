@@ -1,33 +1,23 @@
+{%- assign document_name = page.title | default: page.name | default: site.title | strip_html -%}
+{%- assign document_description = page.description | default: site.description | strip_html | strip_newlines | strip -%}
+{%- assign document_url = page.url | absolute_url -%}
+{%- assign share_image = page.image | default: '/images/web_icon.jpg' | absolute_url -%}
+{%- capture browser_title -%}{{ document_name }}{% if document_name != site.title %} | {{ site.title }}{% endif %}{%- endcapture -%}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>
-  {{ site.title }}{% if site.subtitle %} | {{ site.subtitle }}{% endif %}
-</title>
-
-{% assign description = page.description | default: site.description %}
-{% if site.subtitle %}
-  {% capture description -%}
-    {{ site.subtitle }}. {{ description }}
-  {%- endcapture %}
-{% endif %}
-<meta name="description" content="{{ description | xml_escape }}">
-
-{% if page.robots %}
-<meta name="robots" content="{{ page.robots }}">
-{% else %}
-<meta name="robots" content="index, follow">
-{% endif %}
-
-<link rel="canonical" href="{{ site.url }}{{ site.baseurl }}{{ page.url }}">
-
-<link rel="icon" href="https://galab.khu.ac.kr/images/web_icon.jpg" sizes="192x192">
-
-<meta property="og:title" content="{{ site.title }}">
-<meta property="og:description" content="{{ description | xml_escape }}">
-<meta property="og:image" content="https://galab.khu.ac.kr/images/web_icon.jpg">
-<meta property="og:url" content="{{ site.url }}{{ site.baseurl }}">
-<meta property="og:type" content="website">
-
+<meta name="color-scheme" content="light">
+<title>{{ browser_title | escape }}</title>
+<meta name="description" content="{{ document_description | escape }}">
+<meta name="robots" content="{{ page.robots | default: 'index, follow' | escape }}">
+<link rel="canonical" href="{{ document_url | escape }}">
+<link rel="icon" type="image/jpeg" href="{{ '/images/web_icon.jpg' | relative_url }}">
+<meta property="og:site_name" content="{{ site.title | escape }}">
+<meta property="og:title" content="{{ document_name | escape }}">
+<meta property="og:description" content="{{ document_description | escape }}">
+<meta property="og:url" content="{{ document_url | escape }}">
+<meta property="og:image" content="{{ share_image | uri_escape | escape }}">
+<meta property="og:type" content="{% if page.collection == 'notice' or page.collection == 'blog' or page.collection == 'posts' %}article{% else %}website{% endif %}">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://galab.khu.ac.kr/images/web_icon.jpg">
+<meta name="twitter:title" content="{{ document_name | escape }}">
+<meta name="twitter:description" content="{{ document_description | escape }}">
+<meta name="twitter:image" content="{{ share_image | uri_escape | escape }}">

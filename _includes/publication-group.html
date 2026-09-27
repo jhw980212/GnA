@@ -1,0 +1,13 @@
+<section class="publication-group" id="{{ include.id }}">
+  <div class="section-heading"><h2>{{ include.title }}</h2><span class="item-count">{{ include.items.size }}</span></div>
+  {% assign entries = include.items | sort: 'date' | reverse %}
+  {% assign previous_year = '' %}
+  {% for entry in entries %}
+    {% assign entry_year = entry.date | date: '%Y' %}
+    {% if entry_year != previous_year %}<h3 class="publication-year">{{ entry_year }}</h3>{% assign previous_year = entry_year %}{% endif %}
+    <article class="publication-row" data-publication>
+      <div class="publication-image">{% if entry.image %}<img src="{{ entry.image | relative_url | uri_escape }}" alt="{{ entry.publisher | default: 'Publication cover' | escape }}" loading="lazy">{% endif %}</div>
+      <div class="publication-text"><p class="publication-publisher">{{ entry.publisher }}</p><h4>{% if entry.link %}<a href="{{ entry.link | strip | escape }}">{{ entry.title }} <span aria-hidden="true">↗</span></a>{% else %}{{ entry.title }}{% endif %}</h4><p class="publication-authors">{{ entry.authors | join: ', ' }}</p><p class="publication-meta"><time>{{ entry.date | date: '%Y.%m' }}</time>{% if entry.kind == 'thesis' %}<span>{{ entry.degree }} Thesis</span>{% endif %}{% if entry.id and entry.kind != 'thesis' %}<span>{{ entry.id }}</span>{% endif %}</p>{% if entry.description %}<p class="publication-description">{{ entry.description }}</p>{% endif %}</div>
+    </article>
+  {% endfor %}
+</section>

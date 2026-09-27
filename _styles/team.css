@@ -1,0 +1,111 @@
+/* People directory: sidebar navigation and portrait cards. */
+.people-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 32px 0 24px; border-bottom: 1px solid var(--line); }
+.people-heading h1 { font-size: 34px; font-weight: 600; line-height: 1.2; }
+.people-lead { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
+.people-totals { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: 0; }
+.people-totals > div { display: flex; align-items: baseline; gap: 10px; }
+.people-totals dt { font-size: 14px; color: var(--muted); }
+.people-totals dd { margin: 0; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.people-pi { display: grid; grid-template-columns: 160px 1fr 1fr; align-items: center; gap: 32px; padding: 24px 0; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+.people-pi .pi-image { overflow: hidden; background: white; }
+.people-pi .pi-image img { width: 160px; height: 200px; object-fit: cover; object-position: center 20%; }
+.people-pi .eyebrow { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+.people-pi h2 { font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
+.pi-english { font-size: 15px; margin: 4px 0 8px; }
+.pi-affiliation { font-size: 14px; color: var(--muted); }
+.people-pi-contact { border-left: 1px solid var(--line); padding-left: 24px; }
+.people-pi-contact p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+.people-pi-contact a { display: inline-flex; gap: 10px; margin-right: 20px; padding: 4px 0; font-size: 14px; }
+.people-pi-contact a:hover { text-decoration: underline; }
+.people-directory { display: grid; grid-template-columns: 215px minmax(0, 1fr); gap: 40px; align-items: start; scroll-margin-top: calc(var(--header-height) + 16px); }
+.people-sidebar { position: sticky; top: calc(var(--header-height) + 24px); }
+.people-filters { display: flex; flex-direction: column; gap: 4px; }
+.people-filters a { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; min-height: 42px; font-size: 14px; border: 1px solid transparent; border-left-width: 2px; }
+.people-filters .people-filter-alumni { margin-top: 12px; border-top-color: var(--line); }
+.people-filters a:hover { background: #f5f5f5; }
+.people-filters a[aria-current="true"] { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+.people-filters.has-viewing a[aria-current="true"]:not(.is-viewing) { background: transparent; border-color: transparent; color: var(--muted); }
+.people-filters a.is-viewing { background: var(--accent-soft); color: var(--accent); border-color: transparent; border-left-color: var(--accent); font-weight: 600; }
+.people-filters a.is-viewing[aria-current="true"] { border-color: transparent; border-left-color: var(--accent); }
+.people-filters.has-viewing a.people-filter-alumni:not(.is-viewing) { border-top-color: var(--line); }
+.people-filters b { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.people-results { min-width: 0; }
+.people-search { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.people-search label { font-size: 14px; font-weight: 500; }
+.people-search > div { display: flex; align-items: center; gap: 8px; width: 360px; max-width: 70%; min-height: 42px; border: 1px solid var(--line); border-radius: 3px; padding: 0 12px; }
+.people-search input { width: 100%; min-width: 0; border: 0; outline-offset: 3px; padding: 10px 0; font-size: 14px; background: transparent; color: var(--ink); }
+.people-search > div:focus-within { border-color: var(--accent); }
+.people-search input::-webkit-search-cancel-button { display: none; }
+.people-search button { border: 0; padding: 8px 0 8px 8px; background: transparent; color: var(--muted); font-size: 13px; }
+.people-result-count { margin: 12px 0 20px; color: var(--muted); font-size: 14px; }
+.people-result-count:empty { display: none; }
+.people-page .team-group { margin: 0 0 32px; scroll-margin-top: calc(var(--header-height) + 20px); }
+.roster-group-heading { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.roster-group-heading h2 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+.roster-group-heading > span { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.people-page .member-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 280px)); gap: 24px; }
+.people-page .member-card { min-width: 0; }
+.member-card-link { display: block; height: 100%; }
+.people-page .member-photo { display: block; position: relative; height: 210px; overflow: hidden; background: white; border: 1px solid #ededed; }
+.people-page .member-photo img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
+.member-view { position: absolute; bottom: 8px; right: 8px; background: #fff; padding: 6px 8px; font-size: 13px; opacity: 0; }
+.member-card-link:hover .member-view, .member-card-link:focus-visible .member-view { opacity: 1; }
+.member-card-link:hover h3 { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+.member-card-body { padding: 12px 0 0; }
+.member-role { font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+.member-name-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.member-name-row h3 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+.member-name-row > span { font-size: 15px; color: var(--muted); }
+.member-name-en { font-size: 14px; color: var(--muted); margin: 4px 0 0; line-height: 1.5; }
+.member-summary { font-size: 15px; overflow-wrap: anywhere; color: var(--muted); line-height: 1.6; margin: 8px 0 0; }
+.member-research { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.member-research h4 { font-size: 14px; font-weight: 600; line-height: 1.5; margin-bottom: 5px; }
+.member-research p { font-size: 15px; line-height: 1.65; color: var(--ink); margin: 0; overflow-wrap: anywhere; }
+.member-education-period { margin-top: 4px; }
+.people-group-empty { color: var(--muted); font-size: 14px; padding: 4px 0 12px; margin: 0; }
+.people-empty { border: 1px solid var(--line); padding: 24px; }
+.people-empty h2 { font-size: 20px; margin-bottom: 12px; }
+.people-empty p { font-size: 14px; color: var(--muted); }
+.people-empty button { background: var(--ink); color: white; padding: 10px 16px; border: 0; font-size: 14px; }
+@media (max-width: 1100px) {
+  .people-directory { grid-template-columns: 185px minmax(0, 1fr); gap: 28px; }
+  .people-page .member-grid { grid-template-columns: repeat(2, minmax(0, 280px)); gap: 24px 18px; }
+  .people-totals { gap: 18px; }
+  .people-totals > div { flex-direction: column-reverse; gap: 0; }
+}
+@media (max-width: 760px) {
+  .people-heading { display: block; padding: 26px 0 20px; }
+  .people-heading h1 { font-size: 30px; }
+  .people-lead { font-size: 14px; }
+  .people-totals { margin-top: 14px; gap: 20px; }
+  .people-totals > div { flex-direction: row; gap: 8px; }
+  .people-totals dt { font-size: 13px; }
+  .people-totals dd { font-size: 18px; }
+  .people-pi { grid-template-columns: 112px minmax(0, 1fr); gap: 16px; padding: 20px 0; margin-bottom: 20px; }
+  .people-pi .pi-image img { width: 112px; height: 140px; }
+  .people-pi h2 { font-size: 22px; }
+  .people-pi .eyebrow { margin-bottom: 8px; }
+  .people-pi-contact { grid-column: 1 / -1; border: 0; padding: 0; }
+  .people-pi-contact p { display: none; }
+  .people-pi-contact a { font-size: 14px; margin-right: 16px; }
+  .people-directory { display: block; }
+  .people-sidebar { position: static; margin-bottom: 20px; }
+  .people-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .people-filters .people-filter-alumni { margin-top: 0; }
+  .people-filters a { padding: 8px 10px; font-size: 13px; gap: 8px; border-color: var(--line); }
+  .people-search { gap: 12px; }
+  .people-search label { font-size: 14px; }
+  .people-search > div { flex: 1; max-width: none; }
+  .people-page .member-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }
+  .people-page .member-photo { height: 160px; }
+  .roster-group-heading h2 { font-size: 19px; }
+  .member-name-row h3 { font-size: 19px; }
+  .member-name-en, .member-summary, .member-research p { font-size: 14px; }
+  .member-view { display: none; }
+}
+@media print {
+  .people-directory { display: block; }
+  .people-sidebar, .people-search, .people-result-count, .member-view { display: none; }
+  .people-directory [data-roster-group][hidden], .people-directory [data-member][hidden], .people-directory [data-alumni-groups][hidden] { display: block !important; }
+  .people-empty { display: none !important; }
+}

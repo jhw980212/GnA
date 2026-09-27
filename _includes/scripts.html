@@ -1,22 +1,5 @@
-<!-- third party scripts -->
-<script src="https://unpkg.com/@popperjs/core@2" defer></script>
-<script src="https://unpkg.com/tippy.js@6" defer></script>
-<script src="https://unpkg.com/mark.js@8" defer></script>
-
-<!-- include all js in scripts folder -->
-{% assign scripts = site.static_files | where_exp: "file", "file.path contains '/_scripts'" %}
-{% for script in scripts %}
-  <script src="{{ script.path | relative_url }}"></script>
-{% endfor %}
-
-<!-- third party scripts -->
-<script src="https://unpkg.com/@popperjs/core@2" defer></script>
-<script src="https://unpkg.com/tippy.js@6" defer></script>
-<script src="https://unpkg.com/mark.js@8" defer></script>
-
-<!-- include all js in scripts folder -->
-{% assign scripts = site.static_files | where_exp: "file", "file.path contains '/_scripts'" %}
-{% for script in scripts %}
-  <script src="{{ script.path | relative_url }}"></script>
-{% endfor %}
-
+{% assign asset_version = site.time | date: '%s' %}
+{% if page.section_sidebar %}<script src="{{ '/_scripts/section-navigation.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}
+{% if page.layout == 'home' %}<script src="{{ '/_scripts/home-motion.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}
+{% if page.url == '/research/' %}<script src="{{ '/_scripts/publications.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}
+{% if page.url == '/team/' %}<script src="{{ '/_scripts/team.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}

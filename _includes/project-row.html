@@ -1,0 +1,12 @@
+<article class="project-row">
+  <div class="project-logo">{% if include.project.logo %}<img src="{{ include.project.logo | relative_url | uri_escape }}" alt="{{ include.project.sponsor | escape }}" loading="lazy">{% endif %}</div>
+  <div class="project-info">
+    <p class="project-sponsor">{{ include.project.sponsor }}</p>
+    <h3>{{ include.project.title | default: include.project.title_ko | replace: '<br>', ' ' | replace: '<br/>', ' ' }}</h3>
+    <div class="project-meta">
+      <span>{{ include.project.period | default: include.project.start }}</span>
+      <span class="status-label{% if include.project.status == 'ongoing' %} is-current{% endif %}">{{ include.project.status | capitalize }}</span>
+      {% if include.project.role == 'pi' %}<span>연구 책임자</span>{% elsif include.project.role == 'co_pi' %}<span>공동 연구자</span>{% endif %}
+    </div>
+  </div>
+</article>

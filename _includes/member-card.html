@@ -1,0 +1,17 @@
+{% assign person = include.person %}
+<article class="member-card" data-member data-search="{{ person.name | append: ' ' | append: person.interest | append: ' ' | append: person.program | strip_html | escape }}">
+  <a class="member-card-link" href="{{ person.url | relative_url }}" aria-label="{{ person.name | escape }} profile">
+    <span class="member-photo"><img src="{{ person.image | relative_url | uri_escape }}" alt="" loading="lazy"><span class="member-view" aria-hidden="true">View profile ↗</span></span>
+    <div class="member-card-body">
+      <p class="member-role">{{ person.role_label | default: include.label }}</p>
+      <div class="member-name-row"><h3>{{ person.name | split: ' (' | first }}</h3><span aria-hidden="true">↗</span></div>
+      {% if person.name contains '(' %}<p class="member-name-en">{{ person.name | split: '(' | last | remove: ')' }}</p>{% endif %}
+      {% if person.role == 'alumni' %}
+        {% if person.program %}<p class="member-summary member-program">{{ person.program }}</p>{% endif %}
+        {% if person.affiliation %}<p class="member-summary member-education-period">{{ person.affiliation | remove: 'Education: ' }}</p>{% endif %}
+      {% elsif person.interest %}
+        <div class="member-research"><h4>Research interests</h4><p>{{ person.interest | remove: 'Research interest: ' }}</p></div>
+      {% elsif person.program %}<p class="member-summary">{{ person.program | replace: '<br/>', ' · ' | replace: '<br>', ' · ' | strip_html }}</p>{% endif %}
+    </div>
+  </a>
+</article>

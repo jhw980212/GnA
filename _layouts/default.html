@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" data-dark="false">
+<html lang="en">
   {% include head.html %}
-  <body>
+  <body class="site-shell content-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
     {% include header.html %}
-    <main>
-      {% include content.html content=content %}
+    <main id="main-content"{% if page.reading_width %} class="reading-layout{% if page.section_sidebar %} section-layout{% endif %}"{% endif %}>
+      {% if page.nav and page.custom_heading != true %}{% include page-heading.html %}{% endif %}
+      <div class="page-content">{{ content }}</div>
     </main>
     {% include footer.html %}
   </body>

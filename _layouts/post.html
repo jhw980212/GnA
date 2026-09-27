@@ -1,24 +1,9 @@
 ---
 layout: default
 ---
-
-{% include section.html background=page.image %}
-
-<h1 class="center">{{ page.title }}</h1>
-
-{%
-  include post-info.html
-  author=page.author
-  member=page.member
-  published=page.date
-  updated=page.last_modified_at
-  tags=page.tags
-%}
-
-{% include section.html %}
-
-{{ content }}
-
-{% include section.html %}
-
-{% include post-nav.html post=page %}
+<article class="article-page">
+  <a class="back-link" href="{% if page.collection == 'notice' %}{{ '/notice/' | relative_url }}{% else %}{{ '/blog/' | relative_url }}{% endif %}">← {% if page.collection == 'notice' %}All notices{% else %}Lab journal{% endif %}</a>
+  <header class="article-heading"><p class="eyebrow">{% if page.collection == 'notice' %}Lab notice{% else %}From the lab{% endif %} · <time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: '%Y.%m.%d' }}</time></p><h1>{{ page.title }}</h1></header>
+  <div class="article-body" lang="ko">{{ content }}</div>
+  {% include article-navigation.html %}
+</article>

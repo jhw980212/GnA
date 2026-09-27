@@ -1,0 +1,4 @@
+<section class="team-group" id="{{ include.id }}" data-roster-group data-bucket="{{ include.bucket }}" aria-labelledby="{{ include.id }}-heading">
+  <div class="roster-group-heading"><h2 id="{{ include.id }}-heading">{{ include.title }}</h2><span data-group-count>{{ include.people.size }}</span></div>
+  {% if include.people.size > 0 %}<div class="member-grid">{% for person in include.people %}{% include member-card.html person=person label=include.label %}{% endfor %}</div>{% else %}<p class="people-group-empty">No members currently listed in this group.</p>{% endif %}
+</section>

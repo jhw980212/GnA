@@ -1,0 +1,26 @@
+{% assign articles = site[page.collection] | sort: 'date' %}
+{% if articles.size > 1 %}
+  {% for article in articles %}
+    {% if article.url == page.url %}
+      {% assign older_index = forloop.index0 | minus: 1 %}
+      {% assign newer_index = forloop.index0 | plus: 1 %}
+      <nav class="article-navigation" aria-label="More articles">
+        {% if older_index >= 0 %}
+          {% assign older_article = articles[older_index] %}
+          <a href="{{ older_article.url | relative_url }}" rel="prev">
+            <span class="article-direction">← Earlier</span>
+            <span class="article-title">{{ older_article.title | escape }}</span>
+          </a>
+        {% endif %}
+        {% if newer_index < articles.size %}
+          {% assign newer_article = articles[newer_index] %}
+          <a class="article-newer" href="{{ newer_article.url | relative_url }}" rel="next">
+            <span class="article-direction">Newer →</span>
+            <span class="article-title">{{ newer_article.title | escape }}</span>
+          </a>
+        {% endif %}
+      </nav>
+      {% break %}
+    {% endif %}
+  {% endfor %}
+{% endif %}

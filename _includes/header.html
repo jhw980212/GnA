@@ -1,111 +1,19 @@
-{% assign image = page.header | default: site.header %}
-{% assign dark = page.header-dark | is_nil: site.header-dark | is_nil: true %}
-
-{% assign png = "images/logo2.png" | file_exists %}
-{% assign logo = png %}
-
-<header
-  class="background"
-  style="--image: url('{{ image | relative_url | uri_escape }}')"
-  {% if dark == true or dark == false %}
-    data-dark="{{ dark }}"
-  {% endif %}
-  {% if page.url == "/" %}
-    data-big
-  {% endif %}
->
-
-  <!-- 로고/홈 -->
-  <a href="{{ "/" | relative_url }}" class="home">
-    {% if logo %}
-      <span class="logo">
-        {% if svg %}
-          {{ svg | file_read }}
-        {% else %}
-          <img src="{{ logo | relative_url | uri_escape }}" alt="logo">
-        {% endif %}
-      </span>
-    {% endif %}
-    {% if site.logo-text != false %}
-      <span class="title-text" data-tooltip="Home">
-        {% if site.title and site.show-title != false %}
-          <span class="title">{{ site.title }}</span>
-        {% endif %}
-        {% if site.subtitle and site.show-subtitle != false %}
-          <span class="subtitle">{{ site.subtitle }}</span>
-        {% endif %}
-      </span>
-    {% endif %}
+<header class="site-header">
+  <a href="{{ '/' | relative_url }}" class="home" aria-label="Growth and Aging Lab home">
+    <span class="logo"><img src="{{ '/images/logo2.png' | relative_url }}" alt="Kyung Hee University"></span>
+    <span class="title-text"><span class="title">Growth & Aging Lab</span><span class="subtitle">Kyung Hee University</span></span>
   </a>
-
-  <input class="nav-toggle" type="checkbox" aria-label="show/hide nav">
-
-  <!-- ===== Navigation ===== -->
-  {% assign current_url = page.url | append: "" %}
-  {% assign pages = site.pages
-    | where_exp: "p", "p.nav"
-    | sort: "nav.order"
-  %}
-  <nav>
-    {% for p in pages %}
-      {% if p.nav %}
-        {% assign href = p.dir | relative_url | uri_escape %}
-        {% assign is_active = false %}
-
-        {%- comment -%}
-          active 판정:
-          - 정확히 같은 URL이거나
-          - 같은 디렉토리(폴더)거나
-          - 현재 URL이 디렉토리를 포함(하위 경로)하면 active
-        {%- endcomment -%}
-        {% if current_url == p.url or current_url == p.dir or current_url contains p.dir %}
-          {% assign is_active = true %}
-        {% endif %}
-
-        <a
-          href="{{ href }}"
-          data-tooltip="{{ p.nav.tooltip | xml_escape }}"
-          class="{% if is_active %}active{% endif %}"
-        >
-          {{ p.title }}
-        </a>
-      {% endif %}
+  <input class="nav-toggle" type="checkbox" aria-label="Open or close navigation" aria-controls="site-navigation">
+  <nav id="site-navigation" aria-label="Main navigation">
+    {% assign nav_pages = site.pages | where_exp: 'p', 'p.nav' | sort: 'nav.order' %}
+    {% for item in nav_pages %}
+      {% assign active = false %}
+      {% if page.url == item.url %}{% assign active = true %}{% endif %}
+      {% if page.parent_nav == item.url %}{% assign active = true %}{% endif %}
+      {% if item.url == '/team/' and page.collection == 'members' %}{% assign active = true %}{% endif %}
+      {% if item.url == '/notice/' and page.collection == 'notice' %}{% assign active = true %}{% endif %}
+      {% if item.url == '/blog/' and page.collection == 'blog' %}{% assign active = true %}{% endif %}
+      <a href="{{ item.url | relative_url }}"{% if active %} class="active" aria-current="page"{% endif %}>{{ item.title }}</a>
     {% endfor %}
   </nav>
-
-  <!-- ===== Active 스타일 (라이트/다크 공통) ===== -->
-  <style>
-    header nav a {
-      position: relative;
-      transition: color .2s ease, text-shadow .2s ease, border-color .2s ease;
-    }
-    /* 기본 active (라이트) */
-    header nav a.active {
-      color: #111 !important;
-      border-bottom: 2px solid currentColor;
-      text-shadow: 0 0 6px rgba(0,0,0,.12);
-    }
-    /* 다크모드 active */
-    html[data-dark="true"] header nav a.active {
-      color: #fff !important;
-      border-bottom: 2px solid rgba(255,255,255,.9);
-      text-shadow: 0 0 6px rgba(255,255,255,.7), 0 0 12px rgba(0,123,255,.5);
-    }
-    /* 호버 시 살짝 강조 (active/비active 공통) */
-    header nav a:hover {
-      text-shadow: 0 0 6px rgba(0,0,0,.12);
-    }
-    html[data-dark="true"] header nav a:hover {
-      text-shadow: 0 0 6px rgba(255,255,255,.5);
-    }
-    /* 키보드 포커스 접근성 */
-    header nav a:focus-visible {
-      outline: 2px solid #0a84ff;
-      outline-offset: 2px;
-      border-radius: 4px;
-    }
-    html[data-dark="true"] header nav a:focus-visible {
-      outline-color: #82b7ff;
-    }
-  </style>
 </header>

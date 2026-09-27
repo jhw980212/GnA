@@ -1,31 +1,4 @@
-<script>
-  // 우클릭(컨텍스트 메뉴) 막기
-  document.addEventListener("contextmenu", (e) => e.preventDefault(), { capture: true });
-
-  // 이미지 드래그/드롭 저장 방지
-  document.addEventListener("dragstart", (e) => {
-    if (e.target.tagName === "IMG") e.preventDefault();
-  }, { capture: true });
-
-  // 일반적인 단축키(Ctrl/Cmd+S, U, P, F12 등) 약한 차단
-  document.addEventListener("keydown", (e) => {
-    const k = e.key.toLowerCase();
-    const mod = e.ctrlKey || e.metaKey;
-    if (
-      (mod && ["s","u","p"].includes(k)) || // 저장, 소스보기, 인쇄
-      (e.shiftKey && mod && ["i","c","j"].includes(k)) || // 개발자도구 계열
-      k === "f12"
-    ) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, { capture: true });
-</script>
-
-
 <head>
-  {% include analytics.html %}
-  {% include verification.html %}
   {% include meta.html %}
   {% include fonts.html %}
   {% include styles.html %}
