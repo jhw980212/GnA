@@ -4,6 +4,19 @@ layout: default
 <article class="article-page">
   <a class="back-link" href="{% if page.collection == 'notice' %}{{ '/notice/' | relative_url }}{% else %}{{ '/blog/' | relative_url }}{% endif %}">← {% if page.collection == 'notice' %}All notices{% else %}Lab journal{% endif %}</a>
   <header class="article-heading"><p class="eyebrow">{% if page.collection == 'notice' %}Lab notice{% else %}From the lab{% endif %} · <time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: '%Y.%m.%d' }}</time></p><h1>{{ page.title }}</h1></header>
+  {% if page.image %}
+  <figure class="article-cover">
+    <img src="{{ page.image | relative_url | uri_escape }}" alt="{{ page.image_alt | default: page.title | escape }}">
+    {% if page.image_caption %}<figcaption>{{ page.image_caption | escape }}</figcaption>{% endif %}
+  </figure>
+  {% endif %}
   <div class="article-body" lang="ko">{{ content }}</div>
+  {% if page.gallery.size > 0 %}
+  <div class="article-gallery">
+    {% for photo in page.gallery %}
+    <figure><img src="{{ photo.image | relative_url | uri_escape }}" alt="{{ photo.alt | default: photo.caption | default: page.title | escape }}" loading="lazy">{% if photo.caption %}<figcaption>{{ photo.caption | escape }}</figcaption>{% endif %}</figure>
+    {% endfor %}
+  </div>
+  {% endif %}
   {% include article-navigation.html %}
 </article>

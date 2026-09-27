@@ -1,11 +1,9 @@
 ---
 title: "Growth and Aging Lab 공식 홈페이지 개설 안내"
 date: 2026-01-01
+image: images/notice/share2.png
+image_alt: Growth and Aging Lab 홈페이지 개설
 ---
-
-<img src="/images/notice/share2.png"
-     alt="Growth and Aging Lab 홈페이지 개설"
-     style="max-width:100%; margin:1.5rem 0;">
 
 Growth and Aging Lab의 공식 홈페이지가 개설되었습니다.
 

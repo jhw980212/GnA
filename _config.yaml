@@ -99,6 +99,7 @@ include:
 exclude:
   - .preview
   - README.md
+  - content-templates
   - Gemfile
   - Gemfile.lock
   - vendor

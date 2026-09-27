@@ -10,10 +10,26 @@ nav:
   order: 5
   tooltip: Lab journal
 ---
-{% assign years = site.data.blog | sort: 'year' | reverse %}
+{% assign entries = site.blog | where_exp: 'entry', 'entry.published != false' | where_exp: 'entry', 'entry.date <= site.time' | sort: 'date' | reverse %}
+{% assign years = entries | group_by_exp: 'entry', "entry.date | date: '%Y'" %}
 <div class="browse-layout">
-<aside class="browse-sidebar"><p class="publication-nav-label">Lab journal</p><nav class="section-nav browse-nav" data-section-nav aria-label="Journal years">{% for year in years %}<a href="#year-{{ year.year }}">{{ year.year }}<span>{{ year.gallery.size }}</span></a>{% endfor %}</nav></aside>
+<aside class="browse-sidebar"><p class="publication-nav-label">Lab journal</p><nav class="section-nav browse-nav" data-section-nav aria-label="Journal years">{% for year in years %}<a href="#year-{{ year.name }}">{{ year.name }}<span>{{ year.items.size }}</span></a>{% endfor %}</nav></aside>
 <div class="browse-content">
-{% for year in years %}<section class="journal-year" id="year-{{ year.year }}"><div class="section-heading"><h2>{{ year.year }}</h2><span class="item-count">{{ year.gallery.size }} moments</span></div><div class="journal-grid">{% for entry in year.gallery %}<figure class="journal-entry">{% if entry.link %}<a href="{{ entry.link | relative_url }}">{% endif %}<div class="journal-image"><img src="{{ entry.image | relative_url | uri_escape }}" alt="{{ entry.caption | escape }}" loading="lazy"></div><figcaption><span>{{ entry.caption }}</span>{% if entry.link %}<span aria-hidden="true">↗</span>{% endif %}</figcaption>{% if entry.link %}</a>{% endif %}</figure>{% endfor %}</div></section>{% endfor %}
+{% for year in years %}
+<section class="journal-year" id="year-{{ year.name }}">
+  <div class="section-heading"><h2>{{ year.name }}</h2><span class="item-count">{{ year.items.size }} moments</span></div>
+  <div class="journal-grid">
+    {% for entry in year.items %}
+    <figure class="journal-entry{% unless entry.image %} journal-entry--text{% endunless %}">
+      <a href="{{ entry.url | relative_url }}">
+        {% if entry.image %}<div class="journal-image"><img src="{{ entry.image | relative_url | uri_escape }}" alt="{{ entry.image_alt | default: entry.title | escape }}" loading="lazy"></div>{% endif %}
+        <figcaption><span>{{ entry.title | escape }}</span><span aria-hidden="true">↗</span></figcaption>
+      </a>
+    </figure>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% if entries.size == 0 %}<p>등록된 활동 기록이 없습니다.</p>{% endif %}
 </div>
 </div>

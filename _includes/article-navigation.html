@@ -1,4 +1,4 @@
-{% assign articles = site[page.collection] | sort: 'date' %}
+{% assign articles = site[page.collection] | where_exp: 'article', 'article.published != false' | where_exp: 'article', 'article.date <= site.time' | sort: 'date' %}
 {% if articles.size > 1 %}
   {% for article in articles %}
     {% if article.url == page.url %}
