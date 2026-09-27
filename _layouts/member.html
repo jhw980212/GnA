@@ -4,5 +4,33 @@ layout: default
 <a class="back-link" href="{{ '/team/' | relative_url }}">← Meet the team</a>
 <article class="member-profile">
   <div class="member-profile-photo"><img src="{{ page.image | relative_url | uri_escape }}" alt="{{ page.name | escape }}"></div>
-  <div class="member-profile-info"><p class="eyebrow">Growth & Aging Lab / {% if page.role_label %}{{ page.role_label }}{% else %}{{ page.role | capitalize }}{% endif %}</p><h1>{{ page.name | split: ' (' | first }}</h1>{% if page.name contains '(' %}<p class="profile-name-en">{{ page.name | split: '(' | last | remove: ')' }}</p>{% endif %}{% if page.institution %}<div class="profile-block"><h2>Institution</h2><p>{{ page.institution }}</p></div>{% endif %}{% if page.program %}<div class="profile-block"><h2>Program</h2><p>{{ page.program }}</p></div>{% endif %}{% if page.affiliation %}<div class="profile-block"><h2>Education</h2><p>{{ page.affiliation | remove: 'Education: ' }}</p></div>{% endif %}{% if page.interest %}<div class="profile-block"><h2>Research interests</h2><p>{{ page.interest | remove: 'Research interest: ' }}</p></div>{% endif %}{{ content }}<a class="text-link" href="{{ '/research/' | relative_url }}">Explore our publications <span aria-hidden="true">↗</span></a></div>
+  <div class="member-profile-info">
+    <p class="eyebrow">Growth & Aging Lab / {% if page.role_label %}{{ page.role_label }}{% else %}{{ page.role | capitalize }}{% endif %}</p>
+    <h1>{{ page.name | split: ' (' | first }}</h1>
+    {% if page.name contains '(' %}<p class="profile-name-en">{{ page.name | split: '(' | last | remove: ')' }}</p>{% endif %}
+    {% if page.education.size > 0 %}
+    <section class="profile-block profile-education" aria-labelledby="education-heading">
+      <h2 id="education-heading">Education</h2>
+      <ol class="profile-education-list">
+        {% for education in page.education %}
+        <li>
+          <p class="education-period">{{ education.period | escape }}</p>
+          <h3>{{ education.degree | escape }} · {{ education.field | escape }}</h3>
+          <p>{{ education.school | escape }}</p>
+          <p>{{ education.institution | escape }}{% if education.location %} · {{ education.location | escape }}{% endif %}</p>
+          {% if education.status %}<p class="education-status">{{ education.status | escape }}</p>{% endif %}
+          {% if education.thesis %}<p class="education-thesis"><span>Thesis:</span> <cite>{{ education.thesis | escape }}</cite></p>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% else %}
+      {% if page.institution %}<div class="profile-block"><h2>Institution</h2><p>{{ page.institution }}</p></div>{% endif %}
+      {% if page.program %}<div class="profile-block"><h2>Program</h2><p>{{ page.program }}</p></div>{% endif %}
+      {% if page.affiliation %}<div class="profile-block"><h2>Education</h2><p>{{ page.affiliation | remove: 'Education: ' }}</p></div>{% endif %}
+    {% endif %}
+    {% if page.interest %}<div class="profile-block"><h2>Research interests</h2><p>{{ page.interest | remove: 'Research interest: ' }}</p></div>{% endif %}
+    {{ content }}
+    <a class="text-link" href="{{ '/research/' | relative_url }}">Explore our publications <span aria-hidden="true">↗</span></a>
+  </div>
 </article>

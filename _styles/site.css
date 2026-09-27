@@ -164,6 +164,15 @@ details > summary::-webkit-details-marker { display: none; }
 .profile-block { border-top: 1px solid var(--line); padding-top: 23px; margin-top: 25px; }
 .profile-block h2 { font-size: 14px; font-weight: 600; letter-spacing: .2px; margin-bottom: 14px; }
 .profile-block p { color: var(--muted); }
+.profile-education h2 { font-size: 17px; }
+.profile-education-list { list-style: none; padding: 0; margin: 0; overflow-wrap: anywhere; }
+.profile-education-list li + li { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
+.profile-education-list h3 { font-size: 17px; font-weight: 600; line-height: 1.5; margin: 5px 0; }
+.profile-education-list p { font-size: 15px; line-height: 1.7; margin: 3px 0; }
+.profile-education-list .education-period { font-size: 14px; font-variant-numeric: tabular-nums; }
+.profile-education-list .education-status { color: var(--accent); font-size: 14px; }
+.profile-education-list .education-thesis { margin-top: 10px; font-size: 14px; }
+.education-thesis > span { font-weight: 600; color: var(--ink); }
 .profile-links { display: flex; flex-wrap: wrap; gap: 12px 20px; font-size: 14px; }
 .profile-links a { text-decoration: underline; }
 .member-profile .text-link { margin-top: 20px; }
