@@ -172,6 +172,8 @@ details > summary::-webkit-details-marker { display: none; }
 .profile-education-list .education-period { font-size: 14px; font-variant-numeric: tabular-nums; }
 .profile-education-list .education-status { color: var(--accent); font-size: 14px; }
 .profile-education-list .education-thesis { margin-top: 10px; font-size: 14px; }
+.profile-education-list .education-research { margin-top: 10px; color: var(--ink); }
+.education-research > span { font-weight: 600; }
 .education-thesis > span { font-weight: 600; color: var(--ink); }
 .profile-links { display: flex; flex-wrap: wrap; gap: 12px 20px; font-size: 14px; }
 .profile-links a { text-decoration: underline; }

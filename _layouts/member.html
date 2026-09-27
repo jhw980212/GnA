@@ -18,6 +18,7 @@ layout: default
           <h3>{{ education.degree | escape }} · {{ education.field | escape }}</h3>
           <p>{{ education.school | escape }}</p>
           <p>{{ education.institution | escape }}{% if education.location %} · {{ education.location | escape }}{% endif %}</p>
+          {% if education.research_focus %}<p class="education-research"><span>Research focus:</span> {{ education.research_focus | escape }}</p>{% endif %}
           {% if education.status %}<p class="education-status">{{ education.status | escape }}</p>{% endif %}
           {% if education.thesis %}<p class="education-thesis"><span>Thesis:</span> <cite>{{ education.thesis | escape }}</cite></p>{% endif %}
         </li>
