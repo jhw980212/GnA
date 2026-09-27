@@ -69,6 +69,7 @@ exclude:
   - .preview
   - debug.log
   - README.md
+  - LICENSE.md
   - content-templates
   - Gemfile
   - Gemfile.lock

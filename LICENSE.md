@@ -27,7 +27,7 @@ All rights reserved, subject to the scope and exceptions below.
 
 연구실의 기존 홈페이지 운영·유지보수에 관한 권리관계를 이 고지만으로 변경하지 않습니다.
 
-기존 Greene Laboratory 템플릿에서 유래한 부분에는 BSD 3-Clause License가 적용됩니다. 관련 고지와 원문은 [제3자 고지](https://galab.khu.ac.kr/THIRD_PARTY_NOTICES.md)에 보존하며, 이 이용 조건은 해당 부분의 기존 이용허락을 제한하지 않습니다. 의존 라이브러리와 글꼴에는 각 배포자의 라이선스가 적용됩니다.
+의존 라이브러리와 글꼴에는 각 배포자의 라이선스가 적용되며, 이 고지는 그 권리와 이용허락을 대체하거나 제한하지 않습니다.
 
 ## 권리 보호
 

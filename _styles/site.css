@@ -225,7 +225,6 @@ details > summary::-webkit-details-marker { display: none; }
 .footer-links > a:hover, .footer-contact-links a:hover { text-decoration: underline; }
 .footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; border-top: 1px solid #ffffff25; padding-top: 10px; font-size: 13px; color: #ababaf; }
 .footer-credit { margin: 3px 0 0; font-size: 12px; line-height: 1.5; color: #a5a5aa; }
-.footer-credit a { text-decoration: underline; text-underline-offset: 3px; }
 
 @media (min-width: 761px) {
   .browse-layout { display: grid; grid-template-columns: 185px minmax(0, 1fr); gap: 32px; align-items: start; }
