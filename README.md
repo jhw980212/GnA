@@ -14,6 +14,8 @@
 
 ## 콘텐츠 관리
 
+화면은 `_layouts`, `_includes`, `_styles`, `_scripts`의 자체 코드로 구성합니다. 별도 Jekyll 테마는 사용하지 않습니다. `Gemfile`과 `Gemfile.lock`은 콘텐츠 파일을 HTML로 변환하고 GitHub Pages에 배포하기 위한 빌드 의존성이므로 유지합니다. 활성 플러그인은 사이트맵 생성과 수정일 기록에 필요한 두 개입니다.
+
 Team과 마찬가지로 Markdown 파일 하나가 항목 하나입니다. 별도 DB나 관리자 페이지 없이 파일을 추가·수정한 뒤 GitHub에 반영하면 배포됩니다.
 
 | 콘텐츠 | 관리 위치 | 자동 반영 |

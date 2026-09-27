@@ -1,6 +1,18 @@
 <head>
   {% include meta.html %}
-  {% include fonts.html %}
-  {% include styles.html %}
-  {% include scripts.html %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  {% assign asset_version = site.time | date: '%s' %}
+  <link href="{{ '/_styles/site.css' | relative_url }}?v={{ asset_version }}" rel="stylesheet">
+  {% if page.section_sidebar %}<script src="{{ '/_scripts/section-navigation.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}
+  {% if page.layout == 'home' %}
+    <link href="{{ '/_styles/home.css' | relative_url }}?v={{ asset_version }}" rel="stylesheet">
+    <script src="{{ '/_scripts/home-motion.js' | relative_url }}?v={{ asset_version }}" defer></script>
+  {% endif %}
+  {% if page.url == '/research/' %}<script src="{{ '/_scripts/publications.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}
+  {% if page.url == '/team/' %}
+    <link href="{{ '/_styles/team.css' | relative_url }}?v={{ asset_version }}" rel="stylesheet">
+    <script src="{{ '/_scripts/team.js' | relative_url }}?v={{ asset_version }}" defer></script>
+  {% endif %}
 </head>

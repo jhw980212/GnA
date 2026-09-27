@@ -2,13 +2,10 @@
 title: Publications
 reading_width: true
 section_sidebar: true
-eyebrow: Papers & theses
-section_number: '02'
 lead: Studies of exercise physiology, cardiovascular function, athletic performance, physical activity, growth, and aging.
 robots: index, follow
 nav:
   order: 2
-  tooltip: Papers and theses
 ---
 {% assign international = site.data.citations | where: 'kind', 'paper' | where: 'region', 'international' %}
 {% assign domestic = site.data.citations | where: 'kind', 'paper' | where: 'region', 'domestic' %}

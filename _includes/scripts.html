@@ -1,5 +1,0 @@
-{% assign asset_version = site.time | date: '%s' %}
-{% if page.section_sidebar %}<script src="{{ '/_scripts/section-navigation.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}
-{% if page.layout == 'home' %}<script src="{{ '/_scripts/home-motion.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}
-{% if page.url == '/research/' %}<script src="{{ '/_scripts/publications.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}
-{% if page.url == '/team/' %}<script src="{{ '/_scripts/team.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}

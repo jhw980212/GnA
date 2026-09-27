@@ -2,20 +2,16 @@
 :root {
   color-scheme: light;
   --paper: #fff;
-  --surface: #fff;
   --ink: #171719;
   --muted: #646467;
   --line: #d9d9d6;
   --soft: #eaeae7;
   --night: #101012;
   --white: #f6f6f4;
-  --night-muted: #a5a5aa;
   --accent: #285c91;
   --accent-soft: #edf3f9;
   --accent-line: #bdcfe1;
   --body: Arial, "Noto Sans KR", "Segoe UI", sans-serif;
-  --heading: var(--body);
-  --title: var(--body);
   --gutter: clamp(20px, 3vw, 48px);
   --header-height: 72px;
 }
@@ -41,8 +37,8 @@ section[id], h2[id], h3[id] { scroll-margin-top: calc(var(--header-height) + 28p
 .skip-link { position: fixed; z-index: 110; top: -100px; left: 20px; padding: 12px 22px; background: white; color: black; }
 .skip-link:focus { top: 12px; }
 .eyebrow, .home-eyebrow { font-size: 13px; text-transform: none; letter-spacing: .3px; font-weight: 500; line-height: 1.6; }
-.text-link, .home-text-link { display: inline-flex; align-items: center; justify-content: space-between; gap: 30px; padding: 0 0 9px; border-bottom: 1px solid var(--ink); font-size: 14px; }
-.text-link:hover, .home-text-link:hover { color: var(--accent); border-color: var(--accent); }
+.text-link { display: inline-flex; align-items: center; justify-content: space-between; gap: 30px; padding: 0 0 9px; border-bottom: 1px solid var(--ink); font-size: 14px; }
+.text-link:hover { color: var(--accent); border-color: var(--accent); }
 .back-link { display: inline-block; font-size: 14px; margin-bottom: 40px; color: var(--muted); }
 .back-link:hover { color: var(--ink); }
 
@@ -105,10 +101,10 @@ section[id], h2[id], h3[id] { scroll-margin-top: calc(var(--header-height) + 28p
 .research-area[id] { scroll-margin-top: calc(var(--header-height) + 28px); }
 details > summary { list-style: none; }
 details > summary::-webkit-details-marker { display: none; }
-.equipment-directory > summary, .team-archive > summary { display: flex; align-items: center; gap: 20px; font-size: 23px; padding: 25px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.equipment-directory > summary span, .team-archive > summary span { margin-left: auto; font-size: 13px; color: var(--muted); }
-.equipment-directory > summary::after, .team-archive > summary::after { content: "+"; font-size: 24px; font-weight: 300; }
-.equipment-directory[open] > summary::after, .team-archive[open] > summary::after { content: "−"; }
+.equipment-directory > summary { display: flex; align-items: center; gap: 20px; font-size: 23px; padding: 25px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.equipment-directory > summary span { margin-left: auto; font-size: 13px; color: var(--muted); }
+.equipment-directory > summary::after { content: "+"; font-size: 24px; font-weight: 300; }
+.equipment-directory[open] > summary::after { content: "−"; }
 .facility-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 24px; }
 .facility-image { aspect-ratio: 4 / 3; padding: 27px; background: white; }
 .facility-image img { width: 100%; height: 100%; object-fit: contain; }
@@ -229,7 +225,6 @@ details > summary::-webkit-details-marker { display: none; }
 .footer-links > a:hover, .footer-contact-links a:hover { text-decoration: underline; }
 .footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; border-top: 1px solid #ffffff25; padding-top: 10px; font-size: 13px; color: #ababaf; }
 .footer-credit { margin: 3px 0 0; font-size: 12px; line-height: 1.5; color: #a5a5aa; }
-.footer-credit > span { white-space: nowrap; }
 .footer-credit a { text-decoration: underline; text-underline-offset: 3px; }
 
 @media (min-width: 761px) {
@@ -249,7 +244,6 @@ details > summary::-webkit-details-marker { display: none; }
   .site-header .title { font-size: 15px; }
   .site-header nav { gap: 16px; }
   .site-header nav a { font-size: 13px; }
-  .page-heading-main { gap: 40px; }
   .page-heading-main p { font-size: 16px; }
 }
 @media (max-width: 760px) {
@@ -263,10 +257,10 @@ details > summary::-webkit-details-marker { display: none; }
   .site-header nav a { font-size: 15px; min-height: 44px; }
   .site-header nav a.active::after { width: 22px; right: auto; }
   
-      .page-heading-main { padding: 26px 0 20px; }
+  .page-heading-main { padding: 26px 0 20px; }
   .page-heading h1 { font-size: 30px; }
   .page-heading-main p { margin: 10px 0 0; }
-    .page-content { padding-bottom: 70px; }
+  .page-content { padding-bottom: 70px; }
   .section-nav { gap: 8px 22px; margin-bottom: 40px; padding: 20px 0; }
   .section-nav a { font-size: 13px; }
   .section-heading { gap: 15px; margin-bottom: 26px; }
@@ -283,7 +277,7 @@ details > summary::-webkit-details-marker { display: none; }
   .facility-image { padding: 15px; }
   .facility-card h3 { font-size: 14px; }
   .facility-card p { font-size: 14px; }
-  .equipment-directory > summary, .team-archive > summary { font-size: 19px; gap: 10px; }
+  .equipment-directory > summary { font-size: 19px; gap: 10px; }
   .equipment-directory > summary span { font-size: 13px; }
   .publication-tools { grid-template-columns: 1fr; margin-bottom: 32px; }
   #publication-results { grid-column: 1; }

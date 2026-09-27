@@ -2,13 +2,10 @@
 title: About
 reading_width: true
 section_sidebar: true
-eyebrow: Exercise physiology
-section_number: '01'
 lead: Exercise, physical activity, and physiological function from childhood to older adulthood.
 robots: index, follow
 nav:
   order: 1
-  tooltip: Our lab, research areas, and facilities
 ---
 <div class="browse-layout">
 <aside class="browse-sidebar"><p class="publication-nav-label">About the lab</p><nav class="about-nav browse-nav" data-section-nav aria-label="About sections"><a href="#introduction">Introduction</a><a href="#research-areas">Research areas</a><a href="#facility">Our equipment</a></nav></aside>

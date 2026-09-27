@@ -23,7 +23,7 @@ description: Exercise physiology research on growth, aging, cardiovascular funct
   </div>
 </section>
 
-{% assign latest_notices = site.notice | sort: 'date' | reverse %}
+{% assign latest_notices = site.notice | where_exp: 'item', 'item.published != false' | where_exp: 'item', 'item.date <= site.time' | sort: 'date' | reverse %}
 {% if latest_notices.size > 0 %}
 <section class="home-updates" aria-labelledby="updates-heading">
   <div class="home-updates-heading"><h2 id="updates-heading">From the lab</h2><a class="text-link" href="{{ '/notice/' | relative_url }}">All notices <span aria-hidden="true">↗</span></a></div>

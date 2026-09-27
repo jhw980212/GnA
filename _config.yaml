@@ -1,24 +1,17 @@
-# ============================================
-# SITE INFORMATION
-# ============================================
+# Site identity and deployment.
 title: "Growth and Aging Lab"
-subtitle: "Exercise Physiology"
 description: "Exercise physiology research on growth, aging, cardiovascular function, and athletic performance at Kyung Hee University."
 # GitHub Pages deployment settings
 url: "https://galab.khu.ac.kr"
 baseurl: ""
 
-# ============================================
-# SOCIAL / CONTACT
-# ============================================
+# Lab contact links.
 links:
   email: "jhc@khu.ac.kr"
   orcid: "0000-0002-3465-8965"
   google-scholar: "https://scholar.google.com/citations?user=qm1Ao-oAAAAJ&hl=ko&oi=ao"
 
-# ============================================
-# COLLECTIONS & DEFAULTS
-# ============================================
+# File-based content collections and their layouts.
 
 defaults:
   # 모든 markdown 기본 레이아웃
@@ -32,12 +25,6 @@ defaults:
       type: "members"
     values:
       layout: member
-
-  # blog posts (_posts)
-  - scope:
-      type: "posts"
-    values:
-      layout: post
 
   # notice (공지)
   - scope:
@@ -54,9 +41,7 @@ defaults:
 collections:
   members:
     output: true
-
-  posts:
-    output: true
+    permalink: /members/:path/
 
   notice:
     output: true
@@ -66,45 +51,26 @@ collections:
     output: true
     permalink: /blog/:name/
 
-# ============================================
-# JEKYLL SETTINGS
-# ============================================
+# Rendering.
 markdown: kramdown
 highlighter: rouge
 
-# ⚠️ 이 permalink는 posts에만 적용됨
-permalink: /:categories/:title/
-
-# ============================================
-# PLUGINS (GitHub Pages 허용 범위)
-# ============================================
+# Search discovery and source modification dates.
 plugins:
   - jekyll-sitemap
-  - jekyll-redirect-from
-  - jekyll-feed
   - jekyll-last-modified-at
 
-# ============================================
-# THEME SETTINGS
-# ============================================
-theme: null   # 로컬 커스텀 테마 사용
-
-# ============================================
-# STATIC ASSETS
-# ============================================
+# Assets served by the site; development-only files stay out of the build.
 include:
   - _styles
   - _scripts
 
 exclude:
   - .preview
+  - debug.log
   - README.md
   - content-templates
   - Gemfile
   - Gemfile.lock
   - vendor
   - node_modules
-
-# Optional settings
-# timezone: Asia/Seoul
-# lang: en

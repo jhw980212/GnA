@@ -1,4 +1,0 @@
-{% assign asset_version = site.time | date: '%s' %}
-<link href="{{ '/_styles/site.css' | relative_url }}?v={{ asset_version }}" rel="stylesheet">
-{% if page.layout == 'home' %}<link href="{{ '/_styles/home.css' | relative_url }}?v={{ asset_version }}" rel="stylesheet">{% endif %}
-{% if page.url == '/team/' %}<link href="{{ '/_styles/team.css' | relative_url }}?v={{ asset_version }}" rel="stylesheet">{% endif %}

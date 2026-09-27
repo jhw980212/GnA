@@ -2,13 +2,10 @@
 title: Blog
 reading_width: true
 section_sidebar: true
-eyebrow: Life beyond the measurements
-section_number: '05'
 lead: Fieldwork, milestones, and the everyday moments that make us grow together.
 robots: index, follow
 nav:
   order: 5
-  tooltip: Lab journal
 ---
 {% assign entries = site.blog | where_exp: 'entry', 'entry.published != false' | where_exp: 'entry', 'entry.date <= site.time' | sort: 'date' | reverse %}
 {% assign years = entries | group_by_exp: 'entry', "entry.date | date: '%Y'" %}

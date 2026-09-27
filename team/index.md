@@ -5,7 +5,6 @@ description: Meet the researchers and alumni of the Growth and Aging Lab at Kyun
 robots: index, follow
 nav:
   order: 4
-  tooltip: Our team and alumni
 ---
 {% assign phd_candidates = site.members | where_exp: 'm', "m.role == 'phd' and m.coursework == 'completed'" | sort_natural: 'path' %}
 {% assign phd_students = site.members | where_exp: 'm', "m.role == 'phd' and m.coursework != 'completed'" | sort_natural: 'path' %}

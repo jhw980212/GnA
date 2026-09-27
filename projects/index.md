@@ -2,13 +2,10 @@
 title: Projects
 reading_width: true
 section_sidebar: true
-eyebrow: Questions into action
-section_number: '03'
 lead: Collaborative work connecting exercise physiology with sport, health, and everyday life.
 robots: index, follow
 nav:
   order: 3
-  tooltip: Ongoing and completed projects
 ---
 {% assign ongoing = site.data.projects | where: 'status', 'ongoing' %}
 {% assign completed = site.data.projects | where: 'status', 'completed' %}
