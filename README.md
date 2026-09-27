@@ -4,6 +4,12 @@
 
 웹사이트 디자인 및 개발: **정형웅 (Jeong Hyeong Ung)**
 
+소속: Growth & Aging Lab, Kyung Hee University
+
+**Website design & code © 2026 Jeong Hyeong Ung.** 저작권을 보유하는 독자적 창작 부분에 한해 권리를 유보합니다. 해당 부분의 재사용은 사전 서면 허락이 필요하며, 허락받은 경우에도 제작자 표시를 유지해야 합니다. 출처 표시만으로 재사용이 허용되지는 않습니다.
+
+자세한 범위·예외는 [재사용 조건](LICENSE.md), 기존 템플릿의 라이선스는 [제3자 고지](THIRD_PARTY_NOTICES.md)를 확인하세요. 연구실 자료·사진·논문·로고 등의 권리는 각 권리자에게 있습니다.
+
 [연구실 홈페이지](https://galab.khu.ac.kr/)
 
 ## 콘텐츠 관리
