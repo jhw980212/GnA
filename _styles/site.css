@@ -231,11 +231,13 @@ details > summary::-webkit-details-marker { display: none; }
 .footer-contact-links { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 14px; }
 .footer-contact-links a { padding: 3px 0; }
 .footer-contact address { margin-top: 8px; color: #b3b3ba; font-size: 13px; line-height: 1.7; font-style: normal; }
-.footer-links { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 6px; }
 .footer-links > a { display: block; font-size: 13px; padding: 6px 0; color: var(--white); }
 .footer-links > a:hover, .footer-contact-links a:hover { text-decoration: underline; }
-.footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; border-top: 1px solid #ffffff25; padding-top: 10px; font-size: 13px; color: #ababaf; }
-.footer-credit { margin: 3px 0 0; font-size: 12px; line-height: 1.5; color: #a5a5aa; }
+.footer-bottom { border-top: 1px solid #ffffff25; padding-top: 10px; font-size: 12px; color: #ababaf; }
+.footer-credits { margin: 0; line-height: 1.7; }
+.footer-author { white-space: nowrap; }
+.footer-affiliation { color: #a5a5aa; }
 
 @media (min-width: 761px) {
   .browse-layout { display: grid; grid-template-columns: 185px minmax(0, 1fr); gap: 32px; align-items: start; }
@@ -312,7 +314,6 @@ details > summary::-webkit-details-marker { display: none; }
   .article-body { font-size: 16px; }
   .article-heading h1 { font-size: 29px; }
   .footer-main { grid-template-columns: 1fr; gap: 14px; margin-bottom: 14px; }
-  .footer-bottom { flex-direction: column-reverse; align-items: flex-start; gap: 6px; }
 }
 @media (max-width: 420px) {
   .site-header .title { font-size: 14px; }

@@ -2,8 +2,12 @@
   <div class="footer-inner">
     <div class="footer-main">
       <div class="footer-brand"><a href="{{ '/' | relative_url }}">Growth & Aging Lab</a><p>경희대학교 성장노화연구실 · Exercise Physiology</p><p>지도교수 정현철 · Hyun Chul Jung</p></div>
-      <div class="footer-contact"><div class="footer-contact-links"><a href="mailto:{{ site.links.email }}">{{ site.links.email }}</a><a href="tel:+82312012734">+82 (0)31 201 2734</a></div><address>경희대학교 국제캠퍼스 체육대학 114호<br>경기도 용인시 기흥구 덕영대로 1732, 17104</address></div>
+      <div class="footer-contact">
+        <div class="footer-contact-links"><a href="mailto:{{ site.links.email }}">{{ site.links.email }}</a><a href="tel:+82312012734">+82 (0)31 201 2734</a></div>
+        <address>경희대학교 국제캠퍼스 체육대학 114호<br>경기도 용인시 기흥구 덕영대로 1732, 17104</address>
+        <nav class="footer-links" aria-label="Lab links"><a href="{{ site.links.google-scholar }}">Google Scholar ↗</a><a href="https://orcid.org/{{ site.links.orcid }}">ORCID ↗</a><a href="{{ '/team/' | relative_url }}">Team ↗</a></nav>
+      </div>
     </div>
-    <div class="footer-bottom"><div class="footer-credits"><span>Website design &amp; code © {{ 'now' | date: '%Y' }} Jeong Hyeong Ung.</span><p class="footer-credit">정형웅 · Growth &amp; Aging Lab, Kyung Hee University</p></div><nav class="footer-links" aria-label="Lab links"><a href="{{ site.links.google-scholar }}">Google Scholar ↗</a><a href="https://orcid.org/{{ site.links.orcid }}">ORCID ↗</a><a href="{{ '/team/' | relative_url }}">Team ↗</a></nav></div>
+    <div class="footer-bottom"><p class="footer-credits">Website design &amp; code © {{ 'now' | date: '%Y' }} <span class="footer-author">Jeong Hyeong Ung (정형웅)</span><span class="footer-affiliation"> · Growth &amp; Aging Lab, Kyung Hee University</span></p></div>
   </div>
 </footer>
