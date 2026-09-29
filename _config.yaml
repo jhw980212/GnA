@@ -7,7 +7,7 @@ baseurl: ""
 
 # true: show the maintenance notice on every page; false: publish normally.
 # Commit and push after changing this setting to apply it to the live site.
-maintenance: ture
+maintenance: true
 maintenance_message: "홈페이지를 점검하고 있습니다. 잠시 후 다시 방문해 주세요."
 
 # Lab contact links.
