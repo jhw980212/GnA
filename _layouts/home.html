@@ -1,3 +1,6 @@
+{% if site.maintenance == true %}
+{% include maintenance.html %}
+{% else %}
 <!DOCTYPE html>
 <html lang="en">
   {% include head.html %}
@@ -8,3 +11,4 @@
     {% include footer.html %}
   </body>
 </html>
+{% endif %}
