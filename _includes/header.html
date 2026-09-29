@@ -3,7 +3,10 @@
     <span class="logo"><img src="{{ '/images/logo2.png' | relative_url }}" alt="Kyung Hee University"></span>
     <span class="title-text"><span class="title">Growth & Aging Lab</span><span class="subtitle">Kyung Hee University</span></span>
   </a>
-  <input class="nav-toggle" type="checkbox" aria-label="Open or close navigation" aria-controls="site-navigation">
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">
+    <span>Menu</span>
+    <svg class="nav-toggle-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 6h16M2 14h16"/></svg>
+  </button>
   <nav id="site-navigation" aria-label="Main navigation">
     {% assign nav_pages = site.pages | where_exp: 'p', 'p.nav' | sort: 'nav.order' %}
     {% for item in nav_pages %}

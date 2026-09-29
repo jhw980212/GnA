@@ -5,6 +5,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
   {% assign asset_version = site.time | date: '%s' %}
   <link href="{{ '/_styles/site.css' | relative_url }}?v={{ asset_version }}" rel="stylesheet">
+  <script src="{{ '/_scripts/site-navigation.js' | relative_url }}?v={{ asset_version }}" defer></script>
   {% if page.section_sidebar %}<script src="{{ '/_scripts/section-navigation.js' | relative_url }}?v={{ asset_version }}" defer></script>{% endif %}
   {% if page.layout == 'home' %}
     <link href="{{ '/_styles/home.css' | relative_url }}?v={{ asset_version }}" rel="stylesheet">
