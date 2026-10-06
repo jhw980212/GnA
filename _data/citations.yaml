@@ -1,6 +1,71 @@
 # Publication records maintained here; the site reads this file directly.
 
 # ── International papers ────────────────────────────────────────────────
+- id: doi:10.1111/cpf.70093
+  title: "Acute effects of volume-matched isometric exercise intensity on vascular function and autonomic regulation in men with elevated blood pressure"
+  authors:
+    - Min Ji Jeong
+    - Jae-Geun Kim
+    - Wonil Park
+    - Jung-Hyun Kim
+    - Hyun Chul Jung
+  publisher: Clinical Physiology and Functional Imaging
+  year: 2026
+  date: "2026-10-05"
+  link: https://doi.org/10.1111/cpf.70093
+  kind: paper
+  region: international
+  status: published
+
+- id: doi:10.3390/healthcare14193287
+  title: "Association of Bone-Specific Physical Activity with Bone Mineral Density and Arterial Stiffness in Premenopausal Women: A Cross-Sectional Study"
+  authors:
+    - Sung-Woo Kim
+    - Myong-Won Seo
+    - Hyun Chul Jung
+  publisher: Healthcare
+  year: 2026
+  date: "2026-10-02"
+  link: https://doi.org/10.3390/healthcare14193287
+  kind: paper
+  region: international
+  status: published
+  image: "images/publications/healthcare.png"
+
+- id: doi:10.1123/kr.2026-0018
+  title: "Mapping the Empirical Evidence on Taekwondo Interventions: A Systematic Review of Trends and Health Outcomes in School-Aged Children and Adolescents"
+  authors:
+    - Taemin Ha
+    - Suryeon Ryu
+    - Jong Cheol Shin
+    - Seungbak Lee
+    - Jisu Kim
+    - Hyun Chul Jung
+  publisher: Kinesiology Review
+  year: 2026
+  date: "2026-09-22"
+  link: https://doi.org/10.1123/kr.2026-0018
+  kind: paper
+  region: international
+  status: online ahead of print
+  image: "images/publications/kinesiology-review.jpg"
+
+- id: doi:10.1007/s00421-026-06406-3
+  title: "Impact of cigarette smoking on cardiovascular function following high-intensity interval exercise in physically active smokers"
+  authors:
+    - Chan-Ho Park
+    - Youjin Shin
+    - Wonil Park
+    - Hyun Chul Jung
+  publisher: European Journal of Applied Physiology
+  year: 2026
+  date: "2026-09-08"
+  link: https://doi.org/10.1007/s00421-026-06406-3
+  kind: paper
+  region: international
+  status: online ahead of print
+  image: "images/publications/european applied physiology.jpg"
+
 - id: doi:10.3390/nu18152450
   title: "Enhancing Exercise Performance with Natural Products: A Comprehensive Review"
   authors:
