@@ -16,6 +16,7 @@
   kind: paper
   region: international
   status: published
+  image: "images/publications/clinical-physiology-and-functional-imaging.jpg"
 
 - id: doi:10.3390/healthcare14193287
   title: "Association of Bone-Specific Physical Activity with Bone Mineral Density and Arterial Stiffness in Premenopausal Women: A Cross-Sectional Study"
