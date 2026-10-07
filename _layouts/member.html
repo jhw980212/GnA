@@ -31,6 +31,12 @@ layout: default
       {% if page.affiliation %}<div class="profile-block"><h2>Education</h2><p>{{ page.affiliation | remove: 'Education: ' }}</p></div>{% endif %}
     {% endif %}
     {% if page.interest %}<div class="profile-block"><h2>Research interests</h2><p>{{ page.interest | remove: 'Research interest: ' }}</p></div>{% endif %}
+    {% if page.email %}
+    <section class="profile-block profile-contact" aria-labelledby="contact-heading">
+      <h2 id="contact-heading">Contact</h2>
+      <p><a href="mailto:{{ page.email | escape }}">{{ page.email | escape }}</a></p>
+    </section>
+    {% endif %}
     {{ content }}
     <a class="text-link" href="{{ '/research/' | relative_url }}">Explore our publications <span aria-hidden="true">↗</span></a>
   </div>
