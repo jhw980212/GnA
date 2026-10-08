@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in; connect-src 'self' https://*.supabase.co https://*.supabase.in http://127.0.0.1:54321; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="theme-color" content="#101820">
+  <title>블로그 관리 · Growth &amp; Aging Lab</title>
+  <link rel="stylesheet" href="./cms.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <header class="topbar">
+    <a class="brand" href="../" aria-label="연구실 홈페이지">
+      <img src="../images/logo2.png" alt="" width="38" height="38">
+      <span><strong>Growth &amp; Aging Lab</strong><small>블로그 관리</small></span>
+    </a>
+    <div class="topbar-actions"><a href="../" target="_blank" rel="noopener">홈페이지 보기 <span aria-hidden="true">↗</span></a><button id="signout" class="header-button" hidden>로그아웃</button></div>
+  </header>
+  <div id="demo-banner" class="demo-banner" hidden><span><strong>체험 화면</strong> · 이 화면의 글과 사진은 실제 홈페이지에 반영되지 않습니다.</span><label>역할 <select id="demo-role"><option value="editor">구성원</option><option value="admin">관리자</option></select></label><a href="./">체험 종료</a></div>
+  <main id="main" tabindex="-1">
+    <section id="auth-view" class="auth-layout" aria-labelledby="auth-title">
+      <div class="auth-intro"><p class="eyebrow">LAB BLOG DESK</p><h1>연구실 이야기를<br>함께 기록하세요.</h1><p>글과 사진을 작성해 제출하면,<br>관리자가 확인하고 홈페이지에 반영합니다.</p><ol class="workflow"><li><span>01</span>작성</li><li><span>02</span>검토</li><li><span>03</span>홈페이지 반영</li></ol></div>
+      <div class="auth-card">
+        <p class="eyebrow">MEMBERS ONLY</p><h2 id="auth-title">로그인</h2><p class="muted">전달받은 아이디와 비밀번호로 접속하세요.<br>구성원은 공용 계정으로 블로그 글을 제출하고, 운영자는 별도 관리자 계정으로 승인합니다.</p>
+        <div id="connection-note" class="note" hidden></div>
+        <form id="login-form"><label for="login-email">아이디 또는 이메일</label><input id="login-email" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required placeholder="아이디 또는 이메일 입력"><label for="login-password">비밀번호</label><input id="login-password" type="password" autocomplete="current-password" required><button id="login-button" class="button primary full" type="submit">로그인</button></form>
+        <button id="recovery-button" class="text-button" type="button">비밀번호를 잊으셨나요?</button>
+        <div class="auth-divider"><span>먼저 살펴보기</span></div><button id="demo-button" class="button secondary full" type="button">화면 체험하기 <span aria-hidden="true">→</span></button><p class="auth-footnote">체험에서는 계정 없이 작성·검토 흐름을 확인할 수 있습니다.</p>
+        <p id="auth-feedback" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+    <section id="password-view" class="password-layout" hidden aria-labelledby="password-title"><div class="auth-card"><p class="eyebrow">WELCOME TO THE LAB</p><h1 id="password-title">비밀번호 설정</h1><p class="muted">앞으로 로그인할 때 사용할 비밀번호를 입력하세요.</p><form id="password-form"><label for="new-password">새 비밀번호</label><input id="new-password" type="password" autocomplete="new-password" required minlength="12"><p class="field-hint">12자 이상으로 입력하세요.</p><label for="confirm-password">비밀번호 확인</label><input id="confirm-password" type="password" autocomplete="new-password" required minlength="12"><button class="button primary full" type="submit">비밀번호 저장</button></form><p id="password-feedback" role="status" aria-live="polite"></p></div></section>
+    <section id="workspace" class="workspace" hidden>
+      <aside class="sidebar" aria-label="콘텐츠 메뉴">
+        <div class="profile"><span class="avatar" id="profile-avatar" aria-hidden="true">G</span><strong id="profile-name">구성원</strong><span id="profile-role" class="muted">구성원</span></div>
+        <button id="new-entry" class="button primary full" type="button"><span aria-hidden="true">＋</span> 새 글 작성</button>
+        <nav class="side-nav"><button class="nav-item active" data-filter="all" type="button"><span>전체 글</span><span id="count-all" class="nav-count">0</span></button><button class="nav-item" data-filter="draft" type="button"><span>작성 중</span><span id="count-draft" class="nav-count">0</span></button><button class="nav-item" data-filter="submitted" type="button"><span id="review-nav-label">검토 대기</span><span id="count-submitted" class="nav-count">0</span></button><button class="nav-item" data-filter="changes_requested" type="button"><span>수정 요청</span><span id="count-changes_requested" class="nav-count">0</span></button><button class="nav-item" data-filter="published" type="button"><span>반영 요청됨</span><span id="count-published" class="nav-count">0</span></button></nav>
+        <div id="admin-tools" class="admin-tools" hidden><p class="eyebrow">관리</p><button id="catalog-button" class="nav-item" type="button">기존 블로그 글</button></div>
+        <div class="sidebar-note"><span class="small-circle" aria-hidden="true"></span><p>제출한 글은 관리자 검토 후<br>홈페이지에 반영됩니다.</p></div>
+      </aside>
+      <div class="workspace-main">
+        <div id="workspace-feedback" class="workspace-feedback" role="status" aria-live="polite" hidden></div>
+        <section id="list-view" aria-labelledby="list-title">
+          <div class="page-heading"><div><p class="eyebrow">BLOG</p><h1 id="list-title">전체 글</h1><p id="list-description" class="muted">작성한 글과 검토 상태를 한눈에 확인하세요.</p></div><button id="refresh-button" class="button secondary small" type="button">새로고침 <span aria-hidden="true">↻</span></button></div>
+          <div id="review-summary" class="review-summary" hidden><div><span class="summary-icon" aria-hidden="true">⌁</span><div><strong id="review-summary-title"></strong><p id="review-summary-description"></p></div></div><button id="review-summary-button" class="text-button" type="button">검토 대기 보기 →</button></div>
+          <div class="list-toolbar"><label class="search-field"><span class="sr-only">글 검색</span><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="제목이나 글 내용으로 검색"></label><span id="result-count" class="muted">0개의 글</span></div>
+          <div id="entries" class="entry-list" aria-live="polite"></div>
+        </section>
+        <section id="editor-view" hidden aria-labelledby="editor-title">
+          <button id="back-button" class="text-button back-button" type="button">← 글 목록</button><div class="page-heading editor-heading"><div><p class="eyebrow" id="editor-eyebrow">NEW CONTENT</p><h1 id="editor-title">새 글 작성</h1><p id="editor-meta" class="muted"></p></div><span id="editor-status" class="status-chip"></span></div>
+          <div id="entry-note" class="note" hidden></div>
+          <form id="entry-form" class="editor-form">
+            <div class="editor-content">
+              <div class="editor-card">
+                <div class="date-row"><div id="date-field"><label id="entry-date-label" for="entry-date">게시 날짜</label><input id="entry-date" name="date" type="date" required><p class="field-hint">오늘 또는 이전 날짜를 선택하세요.</p></div></div>
+                <label id="entry-title-label" for="entry-title">제목 <span class="required">*</span></label><input id="entry-title" name="title" placeholder="활동이나 이야기의 제목을 입력하세요" maxlength="200" required>
+                <div id="description-field" class="form-field"><label for="entry-description">짧은 소개</label><textarea id="entry-description" name="description" rows="2" maxlength="500" placeholder="목록에서 보여줄 내용을 짧게 요약하세요"></textarea></div>
+                <div id="body-field"><div class="body-label"><label id="entry-body-label" for="entry-body">본문</label><div class="tabs" role="tablist" aria-label="본문 표시 방식"><button id="write-tab" type="button" role="tab" aria-controls="write-panel" aria-selected="true">작성</button><button id="preview-tab" type="button" role="tab" aria-controls="preview-panel" aria-selected="false">미리보기</button></div></div><div id="write-panel" role="tabpanel" aria-labelledby="write-tab"><div id="markdown-toolbar" class="markdown-toolbar" aria-label="본문 서식"><button type="button" data-format="bold" aria-label="굵게"><strong>B</strong></button><button type="button" data-format="italic" aria-label="기울임"><em>I</em></button><button type="button" data-format="heading" aria-label="소제목">H2</button><button type="button" data-format="list" aria-label="목록">≡</button><button type="button" data-format="link">링크</button></div><textarea id="entry-body" name="body" rows="14" placeholder="연구실 활동과 이야기를 자유롭게 작성하세요."></textarea><p class="field-hint">굵게, 소제목, 목록 등 간단한 Markdown 서식을 사용할 수 있습니다.</p></div><div id="preview-panel" role="tabpanel" aria-labelledby="preview-tab" class="article-preview" hidden></div></div>
+              </div>
+              <div class="editor-card"><div class="card-heading"><div><h2 id="photo-title">사진</h2><p id="photo-description" class="muted">첫 번째 사진이 대표 사진으로 사용됩니다.</p></div><label id="upload-label" class="button secondary small" for="photo-upload"><span aria-hidden="true">＋</span> 사진 추가</label><input id="photo-upload" class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple></div><p id="photo-guidance" class="field-hint">JPG, PNG, WebP · 장당 5 MB 이하 · 최대 10장</p><div id="photo-list" class="photo-list"></div><div id="photo-empty" class="photo-empty"><span aria-hidden="true">▧</span><p>글과 함께 보여줄 사진을 추가하세요.</p></div><p id="upload-status" role="status" aria-live="polite"></p></div>
+            </div>
+            <aside class="editor-side"><div class="editor-card publishing-card"><p class="eyebrow">진행 상태</p><div id="progress-steps" class="progress-steps"></div><p id="publishing-hint" class="muted"></p><div class="editor-actions"><button id="save-button" class="button secondary full" type="submit">임시 저장</button><button id="submit-button" class="button primary full" type="button">검토 요청</button><button id="approve-button" class="button primary full" type="button" hidden>승인하고 반영</button><button id="reject-button" class="button secondary full" type="button" hidden>수정 요청</button></div><p id="save-state" class="field-hint" role="status" aria-live="polite"></p><a id="commit-link" class="text-button" href="#" target="_blank" rel="noopener" hidden>반영 기록 보기 ↗</a><button id="refresh-source-button" class="text-button" type="button" hidden>홈페이지 최신 글 가져오기</button></div><div class="writing-tip"><strong>작성 팁</strong><p>행사 날짜와 참여 내용을 함께 적으면 소식이 더 잘 전달됩니다. 사진에 설명을 달면 누구나 내용을 이해하기 쉬워요.</p></div></aside>
+          </form>
+        </section>
+        <section id="catalog-view" hidden aria-labelledby="catalog-title"><button id="catalog-back" class="text-button back-button" type="button">← 글 목록</button><div class="page-heading"><div><p class="eyebrow">PUBLISHED CONTENT</p><h1 id="catalog-title">기존 블로그 글</h1><p class="muted">홈페이지에 있는 블로그 글과 활동 사진을 가져와 수정하세요.</p></div></div><div class="list-toolbar"><label class="search-field"><span class="sr-only">기존 블로그 글 검색</span><span aria-hidden="true">⌕</span><input id="catalog-search" type="search" placeholder="제목이나 글 내용으로 검색"></label><span id="catalog-count" class="muted"></span></div><div id="catalog-list" class="entry-list"></div></section>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><span>Growth &amp; Aging Lab</span><span>함께 쓰고, 확인하고, 기록합니다.</span></footer>
+  <dialog id="action-dialog" aria-labelledby="dialog-title"><form id="dialog-form"><div class="dialog-heading"><h2 id="dialog-title"></h2><button class="icon-button" id="dialog-close" aria-label="닫기" type="button">×</button></div><p id="dialog-description" class="muted"></p><div id="dialog-fields"></div><p id="dialog-feedback" role="status" aria-live="polite"></p><div class="dialog-actions"><button id="dialog-cancel" class="button secondary" type="button">취소</button><button id="dialog-confirm" class="button primary" type="submit">확인</button></div></form></dialog>
+  <script src="./config.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

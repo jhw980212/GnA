@@ -1,0 +1,15 @@
+project_id = "gna-cms"
+
+[auth]
+site_url = "https://galab.khu.ac.kr/admin/"
+additional_redirect_urls = ["https://galab.khu.ac.kr/admin/"]
+enable_signup = false
+
+[auth.email]
+enable_signup = false
+enable_confirmations = true
+secure_password_change = true
+
+[functions.cms-api]
+# The handler validates every bearer token with Auth and verifies its protected role.
+verify_jwt = false
