@@ -5,7 +5,7 @@ export const ADMIN = "11111111-1111-4111-8111-111111111111";
 export const EDITOR = "22222222-2222-4222-8222-222222222222";
 export const OTHER = "33333333-3333-4333-8333-333333333333";
 export const ORIGIN = "https://galab.khu.ac.kr";
-export const env = { SUPABASE_URL: "https://cms.supabase.co", SUPABASE_ANON_KEY: "anon-key", SUPABASE_SERVICE_ROLE_KEY: "service-secret", CMS_ORIGIN: ORIGIN, GITHUB_TOKEN: "github-secret", GITHUB_REPOSITORY: "exphysio/GnA", GITHUB_BRANCH: "main" };
+export const env = { SUPABASE_URL: "https://cms.supabase.co", SUPABASE_ANON_KEY: "anon-key", SUPABASE_SERVICE_ROLE_KEY: "service-secret", CMS_ORIGIN: ORIGIN, GITHUB_TOKEN: "github-secret", GITHUB_REPOSITORY: "jhw980212/GnA", GITHUB_BRANCH: "main" };
 export const content = (overrides = {}) => ({ collection: "blog", title: "연구실 공지", date: "2026-10-03", body: "행사에 참여해 주세요.\n\n[자세히](https://example.org)", description: "", image_alt: "", image_caption: "", ...overrides });
 const json = (value, status = 200) => new Response(JSON.stringify(value), { status, headers: { "Content-Type": "application/json" } });
 
@@ -76,7 +76,7 @@ export function fixture(options = {}) {
     }
     if (target.host === "api.github.com") {
       assert.equal(headers.get("Authorization"), "Bearer github-secret");
-      const path = decodeURIComponent(target.pathname.replace("/repos/exphysio/GnA", ""));
+      const path = decodeURIComponent(target.pathname.replace("/repos/jhw980212/GnA", ""));
       if (path === "/git/ref/heads/main") return json({ object: { sha: state.head } });
       if (path.startsWith("/contents/")) {
         const name = path.slice("/contents/".length);

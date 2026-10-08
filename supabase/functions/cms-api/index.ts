@@ -8,6 +8,6 @@ Deno.serve(createHandler({
   CMS_ORIGIN: Deno.env.get("CMS_ORIGIN"),
   CMS_ADMIN_URL: Deno.env.get("CMS_ADMIN_URL"),
   GITHUB_TOKEN: Deno.env.get("GITHUB_TOKEN"),
-  GITHUB_REPOSITORY: Deno.env.get("GITHUB_REPOSITORY") || "exphysio/GnA",
+  GITHUB_REPOSITORY: Deno.env.get("GITHUB_REPOSITORY") || "jhw980212/GnA",
   GITHUB_BRANCH: Deno.env.get("GITHUB_BRANCH") || "main",
 }, { parseYaml: (source: string) => load(source, { schema: JSON_SCHEMA }) }));

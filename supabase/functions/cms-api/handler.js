@@ -78,7 +78,7 @@ export function createHandler(env, dependencies = {}) {
   const now = dependencies.now || (() => new Date());
   const parseYaml = dependencies.parseYaml;
   const sb = String(env.SUPABASE_URL || "").replace(/\/$/, "");
-  const repo = env.GITHUB_REPOSITORY || "exphysio/GnA";
+  const repo = env.GITHUB_REPOSITORY || "jhw980212/GnA";
   const branch = env.GITHUB_BRANCH || "main";
   let origin = "";
   try { origin = new URL(env.CMS_ORIGIN).origin; } catch { /* Configuration failure is reported below. */ }

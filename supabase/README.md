@@ -1,8 +1,8 @@
 # 홈페이지 CMS 연결
 
-이 CMS는 **블로그 글과 사진만 관리**합니다. 구성원은 홈페이지 `/admin/`에서 공용 `member` 아이디와 비밀번호로 로그인하여 연구실 이야기·활동 기록과 사진을 제출합니다. 본인은 별도 `admin` 아이디로 로그인하여 승인하거나 수정을 요청합니다. 개인별 가입과 초대 메일 없이 시작할 수 있습니다. 초안·제출 자료는 Supabase에 보관하며, **관리자의 승인 시에만** 서버가 GitHub `exphysio/GnA`의 `main`에 글과 사진을 하나의 커밋으로 반영합니다. 기존 GitHub Actions가 이후 사이트를 배포합니다.
+이 CMS는 **블로그 글과 사진만 관리**합니다. 구성원은 홈페이지 `/admin/`에서 공용 `member` 아이디와 비밀번호로 로그인하여 연구실 이야기·활동 기록과 사진을 제출합니다. 본인은 별도 `admin` 아이디로 로그인하여 승인하거나 수정을 요청합니다. 개인별 가입과 초대 메일 없이 시작할 수 있습니다. 초안·제출 자료는 Supabase에 보관하며, **관리자의 승인 시에만** 서버가 GitHub `jhw980212/GnA`의 `main`에 글과 사진을 하나의 커밋으로 반영합니다. 기존 GitHub Actions가 이후 사이트를 배포합니다.
 
-현재 저장소에는 화면, API, DB 마이그레이션과 계정 생성 도구를 구현했습니다. 실제 Supabase 프로젝트·GitHub 비밀 키는 연결하지 않았으며, 외부 배포와 GitHub 커밋도 실행하지 않았습니다. 아래 최초 설정을 완료해야 실제 계정과 승인 게시가 동작합니다. 공용 계정의 비밀번호는 코드에 저장하지 않습니다.
+CMS 화면과 API, DB 마이그레이션, 계정 생성 도구는 GitHub에 커밋하고 푸시했습니다. GitHub Pages에 관리자 화면이 배포되어 `/admin/`에서 체험할 수 있습니다. 실제 Supabase 프로젝트의 DB·계정·API는 아직 연결하거나 배포하지 않았으며, 서버의 비밀 키도 설정하지 않았습니다. 아래 최초 설정을 완료해야 실제 계정과 승인 게시가 동작합니다. 공용 계정의 비밀번호는 코드에 저장하지 않습니다.
 
 ## 1. Supabase 프로젝트와 DB
 
@@ -54,7 +54,7 @@ Node가 PATH에 없는 이 작업 환경에서는 다음 명령을 사용합니�
 
 ## 3. 서버의 GitHub 연결
 
-GitHub에서 **`exphysio/GnA` 저장소 하나만 선택한 fine-grained 접근 토큰**을 생성합니다. Repository permissions의 `Contents: Read and write`가 필요합니다. GitHub Actions의 저장소 배포 흐름은 기존처럼 유지합니다. 만료 기간을 지정하고 교체 시 Supabase 서버 비밀 값만 갱신하세요. 저장소 조직 정책이나 main 브랜치 보호 규칙이 직접 업데이트를 제한하면 서버 계정에 허용된 쓰기 경로를 마련해야 합니다. 이 API는 강제 푸시와 보호 규칙 우회를 하지 않습니다. [GitHub 토큰 안내](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+GitHub에서 **`jhw980212/GnA` 저장소 하나만 선택한 fine-grained 접근 토큰**을 생성합니다. Repository permissions의 `Contents: Read and write`가 필요합니다. GitHub Actions의 저장소 배포 흐름은 기존처럼 유지합니다. 만료 기간을 지정하고 교체 시 Supabase 서버 비밀 값만 갱신하세요. 저장소 조직 정책이나 main 브랜치 보호 규칙이 직접 업데이트를 제한하면 서버 계정에 허용된 쓰기 경로를 마련해야 합니다. 이 API는 강제 푸시와 보호 규칙 우회를 하지 않습니다. [GitHub 토큰 안내](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
 
 Supabase Edge Function의 Secrets에 아래 값을 설정합니다.
 
@@ -62,7 +62,7 @@ Supabase Edge Function의 Secrets에 아래 값을 설정합니다.
 | --- | --- |
 | `CMS_ORIGIN` | `https://galab.khu.ac.kr` (경로 없이 홈페이지 origin) |
 | `CMS_ADMIN_URL` | 선택 사항. 기본값은 `CMS_ORIGIN` 뒤에 `/admin/` |
-| `GITHUB_REPOSITORY` | `exphysio/GnA` |
+| `GITHUB_REPOSITORY` | `jhw980212/GnA` |
 | `GITHUB_BRANCH` | `main` |
 | `GITHUB_TOKEN` | 위에서 만든 비밀 접근 토큰 |
 
