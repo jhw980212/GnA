@@ -5,13 +5,3 @@
 /.bundle/
 /.preview/
 /debug.log
-.env
-.env.*
-!.env.example
-**/.env
-**/.env.*
-!**/.env.example
-/supabase/.temp/
-/supabase/.branches/
-__pycache__/
-*.pyc

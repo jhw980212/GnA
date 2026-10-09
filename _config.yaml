@@ -19,13 +19,6 @@ links:
 # File-based content collections and their layouts.
 
 defaults:
-  # Standalone CMS stays accessible during maintenance and out of search indexes.
-  - scope:
-      path: "admin"
-    values:
-      layout: null
-      sitemap: false
-
   # 모든 markdown 기본 레이아웃
   - scope:
       path: ""
@@ -78,8 +71,6 @@ include:
   - _scripts
 
 exclude:
-  - supabase
-  - tests
   - .preview
   - debug.log
   - README.md
