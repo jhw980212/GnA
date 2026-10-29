@@ -133,7 +133,7 @@ function cmsRequest(action,payload) {
     if(action==='logout') { cache.remove('lab-cms-csrf'); return {ok:true,value:{ok:true}}; }
     if(!reads.includes(action)) { lock=LockService.getScriptLock(); if(!lock.tryLock(5000)) cmsFail_('다른 저장 작업이 진행 중입니다. 잠시 뒤 다시 시도해 주세요.'); }
     const state=cmsState_(); let value;
-    if(action==='posts') value={posts:Object.values(state.posts).filter(p=>!p.deleted).sort((a,b)=>b.updated.localeCompare(a.updated)).map(p=>cmsPost_(state,p.id,false))};
+    if(action==='posts') value={posts:cmsPosts_(state)};
     if(action==='post') value=cmsPost_(state,cmsId_(payload.id),true);
     if(action==='media') value=cmsMedia_(state,cmsId_(payload.id),true);
     if(action==='site-status') value=cmsStatus_(state);
@@ -231,7 +231,7 @@ function cmsImport_(state) {
   entries.forEach(source=>{cmsCheckSource_(source,head);if(known.has(cmsSourceKey_(source))){skipped++;return;}const id=cmsDigest_('lab-cms-source:'+cmsSourceKey_(source)).slice(0,32);if(state.posts[id])cmsFail_('기존 CMS 자료와 가져오기 식별자가 충돌합니다.');next.push(cmsImportedRow_(source,id));});
   if(Object.keys(state.posts).length+next.length>500)cmsFail_('게시물은 500개까지 관리할 수 있습니다.');
   next.forEach(row=>{state.posts[row.id]=row;});
-  return {imported:next.length,skipped,posts:Object.values(state.posts).filter(row=>!row.deleted).sort((a,b)=>b.updated.localeCompare(a.updated)).map(row=>cmsPost_(state,row.id,false)),message:'현재 홈페이지 자료 '+next.length+'개를 가져왔습니다. 원본과 홈페이지 표시는 아직 변경하지 않았습니다.'};
+  return {imported:next.length,skipped,posts:cmsPosts_(state),message:'현재 홈페이지 자료 '+next.length+'개를 가져왔습니다. 원본과 홈페이지 표시는 아직 변경하지 않았습니다.'};
 }
 function cmsMarkdownBody_(value,original) {
   if(typeof value!=='string'||value.length>200000||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))cmsFail_('기존 글의 Markdown 본문을 확인해 주세요.');
@@ -295,6 +295,11 @@ function cmsMedia_(state,id,detail) {
   const asset=state.media[id]; if(!asset)cmsFail_('첨부파일을 찾을 수 없습니다.');
   const thumb=cmsDataImage_(asset.thumbId);
   return {id,kind:asset.kind,status:'ready',size:asset.size,error:'',url:asset.kind==='image'?thumb:'',poster:asset.kind==='video'?thumb:'',previewUrl:asset.kind==='video'?'https://drive.google.com/file/d/'+asset.fileId+'/preview':'',driveUrl:asset.kind==='video'?'https://drive.google.com/file/d/'+asset.fileId+'/view':''};
+}
+function cmsPosts_(state) {
+  return Object.values(state.posts).filter(row=>!row.deleted)
+    .sort((a,b)=>String(b.draft.date||'').localeCompare(String(a.draft.date||''))||a.id.localeCompare(b.id))
+    .map(row=>cmsPost_(state,row.id,false));
 }
 function cmsPost_(state,id,detail) {
   const row=state.posts[id]; if(!row||row.deleted)cmsFail_('게시물을 찾을 수 없습니다.');
