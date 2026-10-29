@@ -55,7 +55,7 @@ function fixture(options={}) {
       }
       if(method==='patch'){const permission=file.permissions.find(p=>p.id===match[2]);Object.assign(permission,body);return response(permission);}
     }
-    if(target.hostname==='galab.khu.ac.kr')return response({id:state.liveRelease});
+    if(target.hostname==='galab.khu.ac.kr')return target.pathname==='/content/cms-source-catalog.json'?response(state.catalog||{},state.catalog?200:404):response({id:state.liveRelease});
     assert.equal(target.hostname,'api.github.com');assert.equal(init.headers.Authorization,'Bearer github-server-token');assert.equal(init.followRedirects,false);
     const path=decodeURIComponent(target.pathname.replace('/repos/jhw980212/GnA',''));
     if(path==='/git/ref/heads/main')return response({object:{sha:state.head}});
@@ -144,7 +144,7 @@ test('Blog and Notice serializers neutralize Liquid and escape HTML without doub
   const value=post('notice',{title:'A & B <title> {{ site.secret }}',excerpt:'Summary & details',displayMode:'gallery',coverId:image,blocks:[{type:'text',text:'<script>alert(1)</script>\n{% include secret %}'},{type:'image',mediaId:image,alt:'Cover & alt',caption:'Cover caption'},{type:'image',mediaId:second,alt:'Second <img>'},{type:'video',mediaId:video,caption:'Video'},{type:'youtube',url:'https://youtu.be/abcdefghijk',caption:'YouTube'}]});
   const clean=f.context.cmsValidate_(f.readState(),value,true),row={id:ID,revision:1,published:clean};const text=f.context.cmsMarkdown_(row,f.readState());
   assert.equal(text.includes('{{'),false);assert.equal(text.includes('{%'),false);assert.equal(text.includes('<script>'),false);
-  assert.match(text,/title: "A & B <title> \\u007b/);assert.match(text,/summary: "Summary & details"/);assert.match(text,/&lt;script&gt;/);assert.match(text,/class="article-gallery"/);
+  assert.match(text,/"title": "A & B <title> \\u007b/);assert.match(text,/"summary": "Summary & details"/);assert.match(text,/&lt;script&gt;/);assert.match(text,/class="article-gallery"/);
   assert.equal(text.split('src="/images/cms/'+image+'.jpg"').length-1,0,'cover is rendered once by public post layout');assert.match(text,/aspect-ratio:16\/9/);assert.match(text,/max-width:100%/);
 });
 test('publication validation permits optional HTTPS DOI and preserves grouping; rejects scripts, theses or body/video',()=>{
@@ -196,6 +196,85 @@ test('unpublish removes only manifest-owned CMS files and public deployment requ
 test('client responses never contain GitHub/OAuth tokens or internal pending commit metadata',()=>{
   const f=fixture();f.state.flags.failRefBefore=true;save(f,ID,post(),0,'publish');const results=[f.session(),f.call('posts'),f.call('post',{id:ID}),f.call('site-status')];
   for(const result of results){const value=JSON.stringify(result);assert.equal(value.includes('github-server-token'),false);assert.equal(value.includes('google-oauth-token'),false);assert.equal(value.includes('"pending"'),false);}
+});
+
+function catalog(f) {
+  const blogPath='_blog/기존 연구실 이야기.md',noticePath='_notice/Original notice.md',body='\n## Original Markdown\n\nOriginal **bold** body.\n';
+  f.seed(blogPath,'---\ntitle: Original story\n---\n'+body);f.seed(noticePath,'---\ntitle: Original notice\n---\n');
+  const front={title:'Original story',date:'2026-01-01',image:'images/original photo.jpg',image_alt:'Original alt',image_caption:'Original caption',custom:{preserved:true},gallery:[{image:'images/gallery.jpg',caption:'Old gallery'}]};
+  const paper={id:'doi:10.0000/original',title:'A '.repeat(80),authors:['Original Author'],publisher:'Original Journal',year:2022,date:'2023-01-03',link:'http://doi.org/10.0000/original',kind:'paper',region:'international',status:'in_press',image:'images/publications/journal.jpg',volume:4,issue:7,pages:'12-20',pmid:'test-pmid'};
+  const thesis={title:'Original thesis',authors:['Thesis Author'],publisher:'University',year:2020,date:'2020-08',link:'https://example.org/thesis',kind:'thesis',region:'domestic',degree:'M.S.',status:'published',department:'Physical Education',language:'Korean'};
+  const entries=[{collection:'blog',path:blogPath,sha:f.tree()[blogPath],url:'/blog/기존 연구실 이야기/',title:front.title,date:front.date,excerpt:'Original summary',image:front.image,frontMatter:front,body},{collection:'notice',path:noticePath,sha:f.tree()[noticePath],url:'/notice/Original-notice/',title:'Original notice',date:'2026-01-01',excerpt:'',frontMatter:{title:'Original notice',date:'2026-01-01'},body:''},...[[paper,paper.id],[thesis,'legacy:thesis-stable-key']].map(([record,sourceId])=>({collection:'publication',path:'_data/citations.yaml',sha:f.tree()['_data/citations.yaml'],sourceId,record}))];
+  f.state.catalog={version:1,entries};return entries;
+}
+const imported=(f,collection,index=0)=>Object.values(f.readState().posts).filter(row=>row.source?.collection===collection)[index];
+
+test('import reads current public catalog and SHA-verifies all sources without changing any website bytes',()=>{
+  const f=fixture(),entries=catalog(f),before=f.tree(),writes=f.state.refWrites;
+  const result=f.call('import-existing');assert.equal(result.ok,true,JSON.stringify(result));assert.equal(result.value.imported,4);assert.equal(result.value.skipped,0);assert.equal(result.value.posts.length,4);
+  assert.deepEqual(f.tree(),before);assert.equal(f.state.refWrites,writes);assert.ok(Object.values(f.readState().posts).every(row=>row.source&&row.override===false));
+  const old=imported(f,'blog'),value=f.call('post',{id:old.id}).value;assert.equal(value.sourceImported,true);assert.equal(value.markdown,entries[0].body);assert.equal(value.url,entries[0].url);assert.equal(value.legacyImageUrl,'https://galab.khu.ac.kr/images/original photo.jpg');
+  assert.equal(imported(f,'publication').draft.title.length,159);assert.equal(imported(f,'publication').draft.year,2022);assert.equal(imported(f,'publication',1).draft.degree,'M.S.');
+  f.identity(SCHOOL);assert.equal(f.call('posts').value.posts.length,4,'same records visible to every approved admin');
+});
+test('repeated import skips existing drafts and tombstones; invalid or stale catalogs cannot partially import',()=>{
+  const f=fixture(),entries=catalog(f);f.call('import-existing');const row=imported(f,'blog');save(f,row.id,{...row.draft,title:'Edited draft'},row.revision);
+  assert.equal(f.call('import-existing').value.skipped,4);assert.equal(f.readState().posts[row.id].draft.title,'Edited draft');
+  const g=fixture();catalog(g);g.state.catalog.entries.at(-1).sha='f'.repeat(40);const before=g.readState();assert.equal(g.call('import-existing').ok,false);assert.deepEqual(g.readState(),before);
+  g.state.catalog={version:1,entries:[{...entries[0],path:'_members/forged.md'}]};assert.equal(g.call('import-existing').ok,false);assert.equal(g.state.refWrites,0);
+});
+test('editing imported Blog creates a scoped overlay at the same URL and preserves original Markdown, metadata and images',()=>{
+  const f=fixture(),entries=catalog(f),before=f.tree();f.call('import-existing');const row=imported(f,'blog');
+  const result=save(f,row.id,{...row.draft,title:'Updated title',markdown:row.draft.markdown+'\nNew safe paragraph.\n'},row.revision,'publish');assert.equal(result.ok,true,JSON.stringify(result));
+  const path='_blog/cms-'+row.id+'.md',text=f.read(path);assert.match(text,/"cms_source_path": "_blog\/기존 연구실 이야기.md"/);assert.match(text,/"permalink": "\/blog\/기존 연구실 이야기\/"/);assert.match(text,/Original \*\*bold\*\* body/);assert.match(text,/New safe paragraph/);assert.match(text,/"custom": /);assert.match(text,/images\/original photo.jpg/);
+  for(const [path,hash]of Object.entries(before))assert.equal(f.tree()[path],hash,path);
+  assert.equal(f.read('_notice/cms-'+imported(f,'notice').id+'.md'),undefined,'untouched imported notice must not be exported');
+});
+test('imported publication overlay preserves DOI, original year, thesis extras and legacy HTTP links without duplicate originals',()=>{
+  const f=fixture(),entries=catalog(f),before=f.tree()['_data/citations.yaml'];f.call('import-existing');
+  const paper=imported(f,'publication'),thesis=imported(f,'publication',1);
+  assert.equal(save(f,paper.id,{...paper.draft,title:'Updated paper'},paper.revision,'publish').ok,true);
+  assert.equal(save(f,thesis.id,{...thesis.draft,title:'Updated thesis'},thesis.revision,'publish').ok,true);
+  const rows=JSON.parse(f.read('_data/cms-publications.json')),a=rows.find(p=>p.sourceId===entries[2].sourceId),b=rows.find(p=>p.sourceId===entries[3].sourceId);
+  assert.equal(a.id,'doi:10.0000/original');assert.equal(a.year,2022);assert.equal(a.date,'2023-01-03');assert.equal(a.link,entries[2].record.link);assert.equal(a.pmid,'test-pmid');assert.equal(a.pages,'12-20');assert.equal(a.image,entries[2].record.image);
+  assert.equal(b.kind,'thesis');assert.equal(b.degree,'M.S.');assert.equal(b.date,'2020-08');assert.equal(b.department,'Physical Education');assert.equal(b.language,'Korean');assert.equal(b.id,undefined);assert.equal(f.tree()['_data/citations.yaml'],before);
+});
+test('original image removal is reversible and choosing original cover never silently picks an uploaded image',()=>{
+  const f=fixture();catalog(f);f.call('import-existing');const row=imported(f,'blog'),image=upload(f).value.id;
+  let result=save(f,row.id,{...row.draft,coverId:'',blocks:[{type:'image',mediaId:image}],removeOriginalImage:false},row.revision,'publish');assert.equal(result.ok,true);assert.equal(result.value.coverId,'');assert.match(f.read('_blog/cms-'+row.id+'.md'),/"image": "images\/original photo.jpg"/);
+  result=save(f,row.id,{...result.value,removeOriginalImage:true},result.value.revision,'publish');assert.equal(result.ok,true);assert.equal(/^"image":/m.test(f.read('_blog/cms-'+row.id+'.md')),false);assert.ok(result.value.legacyImageUrl,'UI can restore original image after removal');
+  const paper=imported(f,'publication');result=save(f,paper.id,{...paper.draft,removeOriginalImage:true},paper.revision,'publish');assert.equal(result.ok,true);assert.equal(JSON.parse(f.read('_data/cms-publications.json'))[0].image,undefined);
+});
+test('unpublishing/deleting imported content emits safe tombstones and repeat imports never resurrect it',()=>{
+  const f=fixture();catalog(f);f.call('import-existing');const row=imported(f,'blog'),paper=imported(f,'publication');
+  assert.equal(f.call('unpublish',{id:row.id,revision:row.revision}).ok,true);assert.match(f.read('_blog/cms-'+row.id+'.md'),/"published": true/);assert.match(f.read('_blog/cms-'+row.id+'.md'),/"cms_hidden": true/);
+  assert.equal(f.call('delete',{id:paper.id,revision:paper.revision}).ok,true);assert.deepEqual(JSON.parse(f.read('_data/cms-publications.json')),[{sourceId:paper.source.sourceId,cms_hidden:true}]);
+  assert.equal(f.call('import-existing').value.skipped,4);assert.equal(f.call('posts').value.posts.some(p=>p.id===paper.id),false);assert.equal(f.readState().posts[paper.id].deleted,true);
+});
+test('source changes block overlays; explicit versioned refresh updates drafts without republishing',()=>{
+  const f=fixture(),entries=catalog(f);f.call('import-existing');let row=imported(f,'blog');save(f,row.id,{...row.draft,title:'Published edit'},row.revision,'publish');row=f.readState().posts[row.id];
+  f.seed(row.source.path,'Original source changed remotely');const writes=f.state.refWrites,before=f.tree();
+  save(f,row.id,{...row.draft,title:'Second edit'},row.revision,'publish');assert.equal(f.state.refWrites,writes);assert.deepEqual(f.tree(),before);assert.match(f.call('site-status').value.message,/원본/);
+  const current=f.readState().posts[row.id];entries[0].sha=f.tree()[row.source.path];entries[0].body='\nLatest original body.\n';entries[0].title='Latest original';
+  assert.equal(f.call('refresh-existing',{id:row.id,revision:row.revision}).ok,false,'stale version cannot reset draft');
+  const refreshed=f.call('refresh-existing',{id:row.id,revision:current.revision});assert.equal(refreshed.ok,true,JSON.stringify(refreshed));assert.equal(refreshed.value.markdown,entries[0].body);assert.equal(refreshed.value.title,'Latest original');assert.equal(f.state.refWrites,writes);assert.equal(f.readState().posts[row.id].published.title,'Second edit','refresh does not silently replace existing published selection');
+  assert.equal(save(f,row.id,refreshed.value,refreshed.value.revision,'publish').ok,true);assert.match(f.read('_blog/cms-'+row.id+'.md'),/Latest original body/);
+});
+test('imported raw trusted body survives unchanged while new HTML, Liquid and forged source data are rejected',()=>{
+  const f=fixture(),entries=catalog(f);entries[0].body='\n<p>Original trusted HTML</p>\n';f.call('import-existing');const row=imported(f,'blog');
+  assert.equal(save(f,row.id,{...row.draft,title:'Metadata only'},row.revision,'publish').ok,true);assert.match(f.read('_blog/cms-'+row.id+'.md'),/<p>Original trusted HTML<\/p>/);
+  const current=f.readState().posts[row.id];
+  for(const markdown of ['<script>alert(1)</script>','{{ site.secret }}','![x](/bad.jpg){: onerror=alert(1)}','[bad](j%61vascript:alert(1))'])assert.equal(save(f,row.id,{...current.draft,markdown},current.revision).ok,false,markdown);
+  assert.equal(save(f,OTHER,{...post(),source:{path:'_members/forged.md'},markdown:'forged existing body'},0).ok,false);
+});
+test('nested original front matter remains valid JSON-compatible YAML while string Liquid is neutralized',()=>{
+  const f=fixture(),value={gallery:[{image:'images/one.jpg',caption:'{{ literal }}'}],custom:{nested:{enabled:true,values:[1,'{% literal %}',null]}}};
+  const serialized=f.context.cmsDocument_(value,'Body'),lines=serialized.split('\n').slice(1,3);
+  for(const line of lines){const separator=line.indexOf(': '),key=JSON.parse(line.slice(0,separator));assert.deepEqual(JSON.parse(line.slice(separator+2)),value[key]);}
+  assert.equal(serialized.includes('{{'),false);assert.equal(serialized.includes('{%'),false);assert.match(serialized,/\[\{"image"/);
+});
+test('a textarea CRLF normalization preserves exact trusted original Markdown instead of rejecting unchanged HTML',()=>{
+  const f=fixture(),original='\r\n<p>Existing trusted HTML</p>\r\n';assert.equal(f.context.cmsMarkdownBody_(original.replace(/\r\n/g,'\n'),original),original);
 });
 
 module.exports={fixture,post,JPEG,ID,OTHER};

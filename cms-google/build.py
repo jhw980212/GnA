@@ -28,7 +28,7 @@ source = "HtmlService.createHtmlOutputFromFile('Admin').getContent()"
 assert backend.count(source) == 1, 'Expected exactly one Admin HTML reference.'
 backend = backend.replace(source, 'CMS_ADMIN_HTML')
 assert 'createHtmlOutputFromFile' not in backend, 'Standalone bundle must not depend on extra HTML files.'
-bundle = ('// Paste this entire file into Code.gs in a NEW research lab CMS project.\n'
+bundle = ('// Paste this entire file into Code.gs in the research lab CMS project. Keep existing script properties when updating.\n'
           '// Includes the editor; no separate HTML files are required.\n'
           + backend + '\nconst CMS_ADMIN_HTML = ' + json.dumps(html, ensure_ascii=True) + ';\n')
 (ROOT / 'Install.gs').write_text(bundle, encoding='utf-8')

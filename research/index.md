@@ -7,13 +7,11 @@ robots: index, follow
 nav:
   order: 2
 ---
-{% assign cms_papers = site.data.cms-publications | default: empty %}
-{% assign publications = site.data.citations %}
-{% if cms_papers.size > 0 %}{% assign publications = publications | concat: cms_papers %}{% endif %}
+{% assign publications = site.data.cms_effective_publications | default: site.data.citations %}
 {% assign international = publications | where: 'kind', 'paper' | where: 'region', 'international' %}
 {% assign domestic = publications | where: 'kind', 'paper' | where: 'region', 'domestic' %}
-{% assign phd = site.data.citations | where: 'kind', 'thesis' | where: 'degree', 'Ph.D.' %}
-{% assign ms = site.data.citations | where: 'kind', 'thesis' | where: 'degree', 'M.S.' %}
+{% assign phd = publications | where: 'kind', 'thesis' | where: 'degree', 'Ph.D.' %}
+{% assign ms = publications | where: 'kind', 'thesis' | where: 'degree', 'M.S.' %}
 <div class="publication-layout browse-layout">
 <aside class="publication-sidebar browse-sidebar"><p class="publication-nav-label">Browse publications</p><nav class="section-nav publication-nav browse-nav" data-section-nav aria-label="Publication categories"><a href="#international">International <span>{{ international.size }}</span></a><a href="#domestic">Domestic <span>{{ domestic.size }}</span></a>{% if phd.size > 0 %}<a href="#doctoral">Ph.D. theses <span>{{ phd.size }}</span></a>{% endif %}<a href="#masters">M.S. theses <span>{{ ms.size }}</span></a></nav></aside>
 <div class="publication-content browse-content">

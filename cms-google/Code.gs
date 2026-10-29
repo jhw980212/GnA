@@ -119,7 +119,7 @@ function cmsRequest(action,payload) {
   CMS_PERMISSION_CACHE_={};
   let lock;
   try {
-    const email=cmsOwner_(), allowed=['session','posts','post','media','upload','save','publish','unpublish','delete','site-status','site-sync','logout'];
+    const email=cmsOwner_(), allowed=['session','posts','post','media','upload','save','publish','unpublish','delete','site-status','site-sync','import-existing','refresh-existing','logout'];
     if(!allowed.includes(action)) cmsFail_('지원하지 않는 요청입니다.');
     if(payload!=null && (typeof payload!=='object' || Array.isArray(payload))) cmsFail_('요청 형식을 확인해 주세요.');
     payload=payload||{};
@@ -133,28 +133,42 @@ function cmsRequest(action,payload) {
     if(action==='logout') { cache.remove('lab-cms-csrf'); return {ok:true,value:{ok:true}}; }
     if(!reads.includes(action)) { lock=LockService.getScriptLock(); if(!lock.tryLock(5000)) cmsFail_('다른 저장 작업이 진행 중입니다. 잠시 뒤 다시 시도해 주세요.'); }
     const state=cmsState_(); let value;
-    if(action==='posts') value={posts:Object.values(state.posts).sort((a,b)=>b.updated.localeCompare(a.updated)).map(p=>cmsPost_(state,p.id,false))};
+    if(action==='posts') value={posts:Object.values(state.posts).filter(p=>!p.deleted).sort((a,b)=>b.updated.localeCompare(a.updated)).map(p=>cmsPost_(state,p.id,false))};
     if(action==='post') value=cmsPost_(state,cmsId_(payload.id),true);
     if(action==='media') value=cmsMedia_(state,cmsId_(payload.id),true);
     if(action==='site-status') value=cmsStatus_(state);
-    if(['save','publish','unpublish','delete','site-sync'].includes(action) && state.publication && state.publication.pending) {
+    if(['save','publish','unpublish','delete','site-sync','import-existing','refresh-existing'].includes(action) && state.publication && state.publication.pending) {
       cmsRecover_(state); cmsWrite_(state);
     }
     if(action==='upload') { value=cmsUpload_(state,payload); cmsWrite_(state); }
+    if(action==='import-existing') { value=cmsImport_(state);cmsWrite_(state); }
+    if(action==='refresh-existing') {
+      const row=state.posts[cmsId_(payload.id)];
+      if(!row||!row.source||row.deleted||row.revision!==payload.revision)cmsFail_('기존 자료의 최신 버전을 목록에서 다시 열어 주세요.');
+      const entries=cmsCatalog_(),entry=entries.find(item=>cmsSourceKey_(item)===cmsSourceKey_(row.source));
+      if(!entry)cmsFail_('현재 홈페이지에서 원본을 찾지 못했습니다.');
+      const head=cmsHead_();cmsCheckSource_(entry,head);
+      const fresh=cmsImportedRow_(entry,row.id);fresh.revision=row.revision+1;fresh.override=!!row.override;fresh.published=row.published;fresh.publishedSource=row.publishedSource||row.source;
+      state.posts[row.id]=fresh;cmsWrite_(state);value=cmsPost_(state,row.id,true);
+    }
     if(action==='save' || action==='publish') {
       const id=cmsId_(payload.id), current=state.posts[id];
       if(current && current.revision!==payload.revision || !current && payload.revision!==0) cmsFail_('다른 창에서 수정됐습니다. 목록을 다시 열어 주세요.');
       if(!current && Object.keys(state.posts).length>=500) cmsFail_('게시물은 500개까지 관리할 수 있습니다.');
-      const post=cmsValidate_(state,payload.post,action==='publish'), now=new Date().toISOString();
+      if(current&&current.deleted)cmsFail_('삭제된 자료는 다시 게시할 수 없습니다.');
+      const post=cmsValidate_(state,payload.post,action==='publish',current&&current.source), now=new Date().toISOString();
       if(current && current.draft.collection!==post.collection)cmsFail_('기존 자료의 분류는 변경할 수 없습니다. 새 자료로 작성해 주세요.');
       state.posts[id]={id,draft:post,published:current&&current.published||null,revision:(current?current.revision:0)+1,updated:now};
+      if(current&&current.source){state.posts[id].source=current.source;state.posts[id].publishedSource=current.publishedSource||current.source;state.posts[id].override=!!current.override;}
       if(action==='publish') state.posts[id].published=Object.assign({},post,{publishedAt:current&&current.published?current.published.publishedAt:now,updatedAt:now});
+      if(action==='publish'&&current&&current.source){state.posts[id].override=true;state.posts[id].publishedSource=current.source;}
       cmsWrite_(state); if(action==='publish') cmsSyncSafely_(state); value=cmsPost_(state,id,true);
     }
     if(action==='unpublish' || action==='delete') {
       const id=cmsId_(payload.id), row=state.posts[id];
-      if(!row || row.revision!==payload.revision) cmsFail_('다른 창에서 수정됐습니다. 목록을 다시 열어 주세요.');
-      if(action==='delete') delete state.posts[id];
+      if(!row || row.deleted || row.revision!==payload.revision) cmsFail_('다른 창에서 수정됐습니다. 목록을 다시 열어 주세요.');
+      if(row.source){row.published=null;row.override=true;row.deleted=action==='delete';row.revision++;row.updated=new Date().toISOString();}
+      else if(action==='delete') delete state.posts[id];
       else { row.published=null; row.revision++; row.updated=new Date().toISOString(); }
       cmsWrite_(state); cmsSyncSafely_(state); value={ok:true};
     }
@@ -168,20 +182,91 @@ function cmsYoutube_(value) {
   const match=/^https:\/\/(?:www\.|m\.)?(?:youtu\.be\/([\w-]{11})(?:[?#].*)?|youtube\.com\/(?:watch\?(?:[^#]*&)?v=([\w-]{11})(?:[&#].*)?|(?:shorts|live|embed)\/([\w-]{11})(?:[?/#].*)?))$/.exec(value);
   return match&&(match[1]||match[2]||match[3]);
 }
-function cmsValidate_(state,input,publish) {
+function cmsImage_(value) {
+  const path=cmsText_(value||'',1000,false).replace(/^\//,'');
+  if(!path)return '';
+  if(!/^images\//.test(path)||/[\\\x00-\x1f?#<>]/.test(path)||path.split('/').some(part=>!part||part==='.'||part==='..')||/%(?:2e|2f|5c)/i.test(path))cmsFail_('기존 사진은 홈페이지 images 폴더의 안전한 경로만 사용할 수 있습니다.');
+  return path;
+}
+function cmsSourceKey_(source) { return source.collection+':'+(source.collection==='publication'?source.sourceId:source.path); }
+function cmsSource_(entry) {
+  if(!entry||!CMS_COLLECTIONS.includes(entry.collection)||!cmsSha_(entry.sha))cmsFail_('홈페이지 가져오기 목록 형식이 올바르지 않습니다.');
+  const source=JSON.parse(JSON.stringify(entry));
+  if(entry.collection==='publication') {
+    if(entry.path!=='_data/citations.yaml'||typeof entry.sourceId!=='string'||!entry.sourceId||entry.sourceId.length>1000||!entry.record||Array.isArray(entry.record)||typeof entry.record!=='object')cmsFail_('현재 논문 자료의 원본 정보를 확인해 주세요.');
+    if(entry.record.image)cmsImage_(entry.record.image);
+    source.url='/research/';
+  } else {
+    if(typeof entry.path!=='string'||entry.path.length>500||/[\\\x00-\x1f]/.test(entry.path)||entry.path.split('/').length!==2||!entry.path.startsWith('_'+entry.collection+'/')||!entry.path.endsWith('.md')||/^_(?:blog|notice)\/cms-[a-f0-9]{32}\.md$/.test(entry.path))cmsFail_('기존 블로그·공지의 원본 경로를 확인해 주세요.');
+    if(typeof entry.url!=='string'||!entry.url.startsWith('/'+entry.collection+'/')||entry.url.includes('..')||/[\\\x00-\x1f?#<>"']/.test(entry.url))cmsFail_('기존 글 주소를 확인해 주세요.');
+    if(typeof entry.body!=='string'||entry.body.length>200000||!entry.frontMatter||typeof entry.frontMatter!=='object'||Array.isArray(entry.frontMatter)||Object.keys(entry.frontMatter).some(key=>['__proto__','constructor','prototype'].includes(key)))cmsFail_('기존 글의 원문 형식을 확인해 주세요.');
+    if(entry.image)cmsImage_(entry.image);
+  }
+  return source;
+}
+function cmsCheckSource_(source,head) {
+  if(!head.files[source.path]||head.files[source.path].sha!==source.sha)cmsFail_('홈페이지 원본이 GitHub에서 변경됐습니다. 배포가 끝난 뒤 최신 원본을 다시 가져와 주세요.');
+}
+function cmsCatalog_() {
+  const response=UrlFetchApp.fetch(CMS_SITE+'/content/cms-source-catalog.json?t='+Date.now(),{muteHttpExceptions:true,followRedirects:false});
+  if(response.getResponseCode()!==200)cmsFail_('현재 홈페이지 자료 목록을 가져오지 못했습니다. 홈페이지 배포가 끝난 뒤 다시 시도해 주세요.');
+  const text=response.getContentText();if(text.length>3000000)cmsFail_('홈페이지 가져오기 목록이 너무 큽니다.');
+  let catalog;try{catalog=JSON.parse(text);}catch(error){cmsFail_('홈페이지 가져오기 목록을 읽지 못했습니다.');}
+  if(!catalog||catalog.version!==1||!Array.isArray(catalog.entries)||catalog.entries.length>500)cmsFail_('홈페이지 가져오기 목록 형식이 올바르지 않습니다.');
+  const seen=new Set();
+  return catalog.entries.map(entry=>{const source=cmsSource_(entry),key=cmsSourceKey_(source);if(seen.has(key))cmsFail_('홈페이지 원본 목록이 중복되어 있습니다.');seen.add(key);return source;});
+}
+function cmsRecordDate_(record) {
+  const value=String(record.date||record.year+'-01-01');
+  return /^\d{4}-\d{2}$/.test(value)?value+'-01':/^\d{4}$/.test(value)?value+'-01-01':value.slice(0,10);
+}
+function cmsImportedRow_(source,id) {
+  const record=source.record||{}, input=source.collection==='publication'?{collection:'publication',title:record.title,excerpt:record.description||record.summary||'',date:cmsRecordDate_(record),authors:record.authors,publisher:record.publisher||'',link:record.link||'',region:record.region||'international',publicationStatus:record.status||'published',kind:record.kind||'paper',degree:record.degree||'',blocks:[],coverId:'',displayMode:'story'}:{collection:source.collection,title:source.title||source.frontMatter.title||'',excerpt:source.excerpt||'',date:String(source.date).slice(0,10),displayMode:source.frontMatter.display_mode||'story',coverId:'',blocks:[],markdown:source.body};
+  const clean=cmsValidate_({media:{}},input,true,source),now=new Date().toISOString();
+  return {id,source,publishedSource:source,draft:clean,published:JSON.parse(JSON.stringify(clean)),revision:1,updated:now,override:false};
+}
+function cmsImport_(state) {
+  const entries=cmsCatalog_(),head=cmsHead_(),next=[],known=new Set(Object.values(state.posts).filter(row=>row.source).map(row=>cmsSourceKey_(row.source)));let skipped=0;
+  // Validate all source hashes and records before a single durable state write.
+  entries.forEach(source=>{cmsCheckSource_(source,head);if(known.has(cmsSourceKey_(source))){skipped++;return;}const id=cmsDigest_('lab-cms-source:'+cmsSourceKey_(source)).slice(0,32);if(state.posts[id])cmsFail_('기존 CMS 자료와 가져오기 식별자가 충돌합니다.');next.push(cmsImportedRow_(source,id));});
+  if(Object.keys(state.posts).length+next.length>500)cmsFail_('게시물은 500개까지 관리할 수 있습니다.');
+  next.forEach(row=>{state.posts[row.id]=row;});
+  return {imported:next.length,skipped,posts:Object.values(state.posts).filter(row=>!row.deleted).sort((a,b)=>b.updated.localeCompare(a.updated)).map(row=>cmsPost_(state,row.id,false)),message:'현재 홈페이지 자료 '+next.length+'개를 가져왔습니다. 원본과 홈페이지 표시는 아직 변경하지 않았습니다.'};
+}
+function cmsMarkdownBody_(value,original) {
+  if(typeof value!=='string'||value.length>200000||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))cmsFail_('기존 글의 Markdown 본문을 확인해 주세요.');
+  // Textareas normalize CRLF. Preserve the exact trusted original on a no-op edit.
+  if(value===original||typeof original==='string'&&value.replace(/\r\n/g,'\n')===original.replace(/\r\n/g,'\n'))return original;
+  if(/[<>]|\{[{%:]|[%}]\}/.test(value)||/(?:javascript|vbscript|data)\s*:/i.test(value)||/&(?:#x?[0-9a-f]+|colon|Tab|NewLine);/i.test(value))cmsFail_('수정한 원문에는 HTML·Liquid·실행 가능한 링크를 사용할 수 없습니다. 일반 Markdown으로 작성해 주세요.');
+  const links=[...value.matchAll(/\]\(\s*([^\s)]+)/g),...value.matchAll(/^\s{0,3}\[[^\]]+\]:\s*(\S+)/gm)];
+  links.forEach(match=>{let target=match[1].replace(/\\/g,'');try{target=decodeURIComponent(target);}catch(error){}const scheme=target.match(/^([a-z][a-z0-9+.-]*):/i);if(scheme&&!/^(https?|mailto)$/i.test(scheme[1]))cmsFail_('수정한 본문의 링크 형식을 확인해 주세요.');});
+  return value;
+}
+function cmsValidate_(state,input,publish,source) {
   if(!input || !Array.isArray(input.blocks) || input.blocks.length>100) cmsFail_('본문 형식을 확인해 주세요.');
   if(!CMS_COLLECTIONS.includes(input.collection))cmsFail_('블로그·공지·논문만 CMS에서 관리할 수 있습니다.');
   const paper=input.collection==='publication';
-  const post={collection:input.collection,title:cmsText_(input.title||'',100,publish),excerpt:cmsText_(input.excerpt||'',180),date:cmsDate_(input.date||cmsToday_()),displayMode:input.displayMode||'story',coverId:input.coverId||'',blocks:[]};
+  const post={collection:input.collection,title:cmsText_(input.title||'',500,publish),excerpt:cmsText_(input.excerpt||'',1000),date:cmsDate_(input.date||cmsToday_()),displayMode:input.displayMode||'story',coverId:input.coverId||'',blocks:[]};
+  if(source&&source.collection!==input.collection)cmsFail_('기존 자료의 분류는 변경할 수 없습니다.');
+  if(source&&!paper) {
+    post.markdown=cmsMarkdownBody_(input.markdown===undefined?source.body:input.markdown,source.body);
+    if(input.removeOriginalImage!==undefined&&typeof input.removeOriginalImage!=='boolean')cmsFail_('기존 사진 선택을 확인해 주세요.');
+    post.removeOriginalImage=!!input.removeOriginalImage;
+  } else if(input.markdown!==undefined||!source&&input.removeOriginalImage)cmsFail_('기존 글에서만 원문을 편집할 수 있습니다.');
   if(paper) {
     if(!Array.isArray(input.authors)||input.authors.length>40||publish&&!input.authors.length)cmsFail_('논문 저자를 한 명씩 입력해 주세요.');
     post.authors=input.authors.map(author=>cmsText_(author,160,true));
     post.publisher=cmsText_(input.publisher||'',300,publish);
     post.link=cmsText_(input.link||'',1000,false);
-    if(post.link&&!/^https:\/\/(?![^/?#]*@)[a-z0-9][a-z0-9.-]*(?::443)?(?:[/?#][^\s<>\\]*)?$/i.test(post.link))cmsFail_('논문 링크는 HTTPS 웹 주소를 입력해 주세요.');
+    if(post.link&&!/^https:\/\/(?![^/?#]*@)[a-z0-9][a-z0-9.-]*(?::443)?(?:[/?#][^\s<>\\]*)?$/i.test(post.link)&&!(source&&source.record&&post.link===source.record.link&&/^http:\/\/(?![^/?#]*@)[a-z0-9][a-z0-9.-]*(?:[/?#][^\s<>\\]*)?$/i.test(post.link)))cmsFail_('새 논문 링크는 HTTPS 웹 주소를 입력해 주세요.');
     post.region=input.region||'international';post.publicationStatus=input.publicationStatus||'published';
-    if(!['international','domestic'].includes(post.region)||!['published','online ahead of print'].includes(post.publicationStatus))cmsFail_('논문 구분과 게재 상태를 확인해 주세요.');
-    if(input.kind&&input.kind!=='paper')cmsFail_('학위논문은 기존 파일에서 직접 관리해 주세요.');
+    if(!['international','domestic'].includes(post.region)||!['published','online ahead of print','in press','in_press'].includes(post.publicationStatus))cmsFail_('논문 구분과 게재 상태를 확인해 주세요.');
+    post.kind=input.kind||'paper';if(!['paper','thesis'].includes(post.kind))cmsFail_('논문 종류를 확인해 주세요.');
+    post.degree=post.kind==='thesis'?cmsText_(input.degree||'',20,publish):'';
+    if(post.kind==='thesis'&&!['Ph.D.','M.S.'].includes(post.degree))cmsFail_('학위 종류를 선택해 주세요.');
+    post.year=source&&source.record&&post.date===cmsRecordDate_(source.record)&&Number.isInteger(Number(source.record.year))?Number(source.record.year):Number(post.date.slice(0,4));
+    if(input.removeOriginalImage!==undefined&&typeof input.removeOriginalImage!=='boolean')cmsFail_('기존 사진 선택을 확인해 주세요.');
+    post.removeOriginalImage=!!input.removeOriginalImage;
     if(input.blocks.length>1||input.blocks.some(block=>!block||block.type!=='image'))cmsFail_('논문에는 선택한 이미지 한 장만 첨부할 수 있습니다.');
   }
   if(!['story','gallery'].includes(post.displayMode)) cmsFail_('이야기형 또는 사진첩형을 선택해 주세요.');
@@ -199,9 +284,9 @@ function cmsValidate_(state,input,publish) {
     } else cmsFail_('지원하지 않는 본문 형식입니다.');
   });
   if(ids.length>30)cmsFail_('한 게시물에는 사진·영상 30개까지 첨부할 수 있습니다.');
-  if(publish && !paper && !post.blocks.length)cmsFail_('글이나 사진·영상을 하나 이상 넣어 주세요.');
+  if(publish && !paper && !post.blocks.length && !source)cmsFail_('글이나 사진·영상을 하나 이상 넣어 주세요.');
   if(post.coverId && !ids.includes(post.coverId))cmsFail_('대표 이미지는 본문의 첨부파일 중 선택해 주세요.');
-  post.coverId=post.coverId||ids[0]||'';
+  post.coverId=source?post.coverId:post.coverId||ids[0]||'';
   if(!post.excerpt)post.excerpt=(post.blocks.find(b=>b.type==='text')||{text:''}).text.slice(0,140);
   return post;
 }
@@ -212,11 +297,12 @@ function cmsMedia_(state,id,detail) {
   return {id,kind:asset.kind,status:'ready',size:asset.size,error:'',url:asset.kind==='image'?thumb:'',poster:asset.kind==='video'?thumb:'',previewUrl:asset.kind==='video'?'https://drive.google.com/file/d/'+asset.fileId+'/preview':'',driveUrl:asset.kind==='video'?'https://drive.google.com/file/d/'+asset.fileId+'/view':''};
 }
 function cmsPost_(state,id,detail) {
-  const row=state.posts[id]; if(!row)cmsFail_('게시물을 찾을 수 없습니다.');
+  const row=state.posts[id]; if(!row||row.deleted)cmsFail_('게시물을 찾을 수 없습니다.');
   const value=JSON.parse(JSON.stringify(row.draft)), ids=detail?value.blocks.filter(b=>b.mediaId).map(b=>b.mediaId):[value.coverId];
   value.media={}; [...new Set(ids)].filter(Boolean).forEach(mid=>value.media[mid]=cmsMedia_(state,mid,detail));
-  const keys=['collection','title','excerpt','date','displayMode','coverId','blocks','authors','publisher','link','region','publicationStatus'];
-  return Object.assign(value,{id,revision:row.revision,updated:row.updated,status:row.published?'published':'draft',hasChanges:!!row.published&&keys.some(k=>JSON.stringify(row.draft[k])!==JSON.stringify(row.published[k])),url:value.collection==='publication'?'/research/':'/'+value.collection+'/cms-'+id+'/'});
+  const keys=['collection','title','excerpt','date','displayMode','coverId','blocks','authors','publisher','link','region','publicationStatus','kind','degree','markdown','removeOriginalImage'];
+  const originalImage=row.source&&(row.source.collection==='publication'?row.source.record.image:row.source.image);
+  return Object.assign(value,{id,revision:row.revision,updated:row.updated,status:row.published?'published':'draft',hasChanges:!!row.published&&keys.some(k=>JSON.stringify(row.draft[k])!==JSON.stringify(row.published[k])),sourceImported:!!row.source,legacyImageUrl:originalImage?CMS_SITE+'/'+cmsImage_(originalImage):'',url:row.source&&row.source.url||(value.collection==='publication'?'/research/':'/'+value.collection+'/cms-'+id+'/')});
 }
 function cmsBase64_(value,max) {
   // Avoid a repeated regex group: multi-megabyte images can overflow its stack.
@@ -244,7 +330,10 @@ function cmsUpload_(state,payload) {
 function cmsAssetPath_(id,kind,poster) { cmsId_(id); return 'images/cms/'+id+(poster?'-poster.jpg':kind==='video'?'.mp4':'.jpg'); }
 function cmsMarkdown_(row,state) {
   if(!['blog','notice'].includes(row.published.collection))cmsFail_('블로그 또는 공지 글만 Markdown으로 게시할 수 있습니다.');
-  const post=row.published, e=cmsEscape_, cover=post.coverId&&state.media[post.coverId], front={layout:'post',title:post.title,date:post.date,published:true,summary:post.excerpt,description:post.excerpt,cms_entry_id:cmsId_(row.id),cms_revision:row.revision,display_mode:post.displayMode};
+  const source=row.publishedSource||row.source,post=row.published, e=cmsEscape_, cover=post.coverId&&state.media[post.coverId], front=Object.assign({},source&&source.frontMatter||{},{layout:'post',title:post.title,date:post.date,published:true,summary:post.excerpt,description:post.excerpt,cms_entry_id:cmsId_(row.id),cms_revision:row.revision,display_mode:post.displayMode});
+  if(source){front.cms_source_path=source.path;front.permalink=source.url;delete front.cms_hidden;}
+  if(source&&post.removeOriginalImage){delete front.image;delete front.image_alt;delete front.image_caption;}
+  else if(source&&front.image)front.image=cmsImage_(front.image);
   if(cover) {
     const block=post.blocks.find(b=>b.mediaId===post.coverId)||{};
     front.image=cmsAssetPath_(post.coverId,cover.kind,cover.kind==='video'); front.image_alt=block.alt||post.title; front.image_caption=block.caption||'';
@@ -263,12 +352,25 @@ function cmsMarkdown_(row,state) {
     const html=b.type==='youtube'?'<iframe style="width:100%;aspect-ratio:16/9;border:0" src="https://www.youtube-nocookie.com/embed/'+e(b.videoId)+'" title="'+e(b.caption||post.title)+'" loading="lazy" allowfullscreen></iframe>':b.type==='image'?'<img src="/'+cmsAssetPath_(b.mediaId,'image',false)+'" alt="'+e(b.alt||post.title)+'" loading="lazy">':'<video style="display:block;width:100%;max-width:100%" controls playsinline preload="metadata" poster="/'+cmsAssetPath_(b.mediaId,'video',true)+'" src="/'+cmsAssetPath_(b.mediaId,'video',false)+'"></video>';
     parts.push('<figure>'+html+caption+'</figure>');
   }); flush();
-  return '---\n'+Object.keys(front).map(key=>key+': '+JSON.stringify(front[key]).replace(/\{/g,'\\u007b').replace(/\}/g,'\\u007d')).join('\n')+'\n---\n\n'+parts.join('\n\n')+'\n';
+  return cmsDocument_(front,(post.markdown===undefined?'':cmsMarkdownBody_(post.markdown,source&&source.body||'')+'\n\n')+parts.join('\n\n'));
 }
+function cmsYamlValue_(value) {
+  // Escape Liquid delimiters only inside JSON strings, never object syntax.
+  return JSON.stringify(value).replace(/"(?:\\.|[^"\\])*"/g,token=>token.replace(/\{/g,'\\u007b').replace(/\}/g,'\\u007d'));
+}
+function cmsDocument_(front,body) { return '---\n'+Object.keys(front).map(key=>JSON.stringify(key)+': '+cmsYamlValue_(front[key])).join('\n')+'\n---\n\n'+body+'\n'; }
+function cmsTombstone_(row) { return cmsDocument_({layout:'post',title:row.draft.title,date:row.draft.date,published:true,cms_hidden:true,cms_source_path:row.source.path,permalink:row.source.url,cms_entry_id:cmsId_(row.id),cms_revision:row.revision},''); }
 function cmsPublication_(row,state) {
-  const post=cmsValidate_(state,row.published,true);
+  const source=row.publishedSource||row.source,post=cmsValidate_(state,row.published,true,source);
   if(post.collection!=='publication')cmsFail_('논문 자료가 아닙니다.');
-  const result={id:'cms:'+cmsId_(row.id),title:post.title,authors:post.authors,publisher:post.publisher,year:Number(post.date.slice(0,4)),date:post.date,link:post.link,kind:'paper',region:post.region,status:post.publicationStatus,description:post.excerpt};
+  const result=Object.assign({},source&&source.record||{},{id:'cms:'+cmsId_(row.id),title:post.title,authors:post.authors,publisher:post.publisher,year:post.year,date:post.date,link:post.link,kind:post.kind,region:post.region,status:post.publicationStatus,description:post.excerpt});
+  if(source)result.sourceId=source.sourceId;
+  if(source){if(source.record.id)result.id=source.record.id;else delete result.id;}
+  if(source&&post.date===cmsRecordDate_(source.record)&&source.record.date)result.date=source.record.date;
+  delete result.cms_hidden;
+  if(post.kind==='thesis')result.degree=post.degree;else delete result.degree;
+  if(post.removeOriginalImage)delete result.image;
+  else if(result.image)result.image=cmsImage_(result.image);
   if(post.coverId)result.image=cmsAssetPath_(post.coverId,'image',false);
   return result;
 }
@@ -336,10 +438,11 @@ function cmsSyncSafely_(state) {
 }
 function cmsSync_(state) {
   // Validate the remote manifest before creating even unreferenced Git blobs.
-  cmsPrior_(cmsHead_());
-  const pending={}, posts=Object.values(state.posts).filter(row=>row.published), mediaIds=[...new Set(posts.flatMap(row=>row.published.blocks.filter(b=>b.mediaId).map(b=>b.mediaId)))];
+  const initial=cmsHead_();cmsPrior_(initial);
+  const pending={}, active=Object.values(state.posts).filter(row=>!row.source||row.override), posts=active.filter(row=>row.published), mediaIds=[...new Set(posts.flatMap(row=>row.published.blocks.filter(b=>b.mediaId).map(b=>b.mediaId)))];
+  active.filter(row=>row.source).forEach(row=>{cmsSource_(row.source);cmsCheckSource_(row.source,initial);});
   // Validate all published snapshots before producing any repository writes.
-  posts.forEach(row=>{cmsId_(row.id);cmsValidate_(state,row.published,true);});
+  posts.forEach(row=>{cmsId_(row.id);cmsValidate_(state,row.published,true,row.publishedSource||row.source);});
   mediaIds.forEach(id=>{
     const asset=state.media[cmsId_(id)], bytes=cmsFile_(asset.fileId).getBlob().getBytes();
     if(bytes.length!==asset.size)cmsFail_('저장된 첨부파일 크기가 변경됐습니다. 백업을 확인해 주세요.');
@@ -348,6 +451,7 @@ function cmsSync_(state) {
   });
   posts.filter(row=>row.published.collection!=='publication').forEach(row=>{pending['_'+row.published.collection+'/cms-'+row.id+'.md']=cmsBlob_(cmsMarkdown_(row,state),false);});
   const papers=posts.filter(row=>row.published.collection==='publication').map(row=>cmsPublication_(row,state));
+  active.filter(row=>row.source&&!row.published).forEach(row=>{if(row.source.collection==='publication')papers.push({sourceId:row.source.sourceId,cms_hidden:true});else pending['_'+row.source.collection+'/cms-'+row.id+'.md']=cmsBlob_(cmsTombstone_(row),false);});
   if(papers.length)pending['_data/cms-publications.json']=cmsBlob_(JSON.stringify(papers),false);
   const release=cmsDigest_(JSON.stringify(Object.keys(pending).sort().map(path=>[path,pending[path]])));
   pending[CMS_RELEASE]=cmsBlob_(JSON.stringify({id:release}),false);
@@ -355,7 +459,9 @@ function cmsSync_(state) {
   Object.keys(pending).sort().forEach(path=>{if(!cmsOwned_(path))cmsFail_('허용되지 않은 게시 경로입니다.');manifest.files[path]=pending[path];});
   const manifestSha=cmsBlob_(JSON.stringify(manifest),false);pending[CMS_MANIFEST]=manifestSha;
   for(let attempt=0;attempt<3;attempt++) {
-    const head=cmsHead_(), prior=cmsPrior_(head), updates=Object.keys(pending).filter(path=>!head.files[path]||head.files[path].sha!==pending[path]).map(path=>({path,mode:'100644',type:'blob',sha:pending[path]}));
+    const head=cmsHead_(), prior=cmsPrior_(head);
+    active.filter(row=>row.source).forEach(row=>cmsCheckSource_(row.source,head));
+    const updates=Object.keys(pending).filter(path=>!head.files[path]||head.files[path].sha!==pending[path]).map(path=>({path,mode:'100644',type:'blob',sha:pending[path]}));
     Object.keys(prior.files).filter(path=>!Object.prototype.hasOwnProperty.call(pending,path)).forEach(path=>updates.push({path,mode:'100644',type:'blob',sha:null}));
     if(!updates.length){state.publication={phase:'building',message:'GitHub 내용은 최신입니다. 홈페이지 반영을 확인하고 있습니다.',commit:head.sha,release,started:Date.now()};return;}
     const tree=cmsGithub_('/git/trees','post',{base_tree:head.tree,tree:updates}), commit=cmsGithub_('/git/commits','post',{message:'Publish lab Blog from Google CMS',tree:tree.sha,parents:[head.sha]});
