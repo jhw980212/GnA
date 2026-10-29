@@ -71,6 +71,7 @@ include:
   - _scripts
 
 exclude:
+  - cms-google
   - .preview
   - debug.log
   - README.md

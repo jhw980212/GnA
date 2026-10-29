@@ -7,8 +7,11 @@ robots: index, follow
 nav:
   order: 2
 ---
-{% assign international = site.data.citations | where: 'kind', 'paper' | where: 'region', 'international' %}
-{% assign domestic = site.data.citations | where: 'kind', 'paper' | where: 'region', 'domestic' %}
+{% assign cms_papers = site.data.cms-publications | default: empty %}
+{% assign publications = site.data.citations %}
+{% if cms_papers.size > 0 %}{% assign publications = publications | concat: cms_papers %}{% endif %}
+{% assign international = publications | where: 'kind', 'paper' | where: 'region', 'international' %}
+{% assign domestic = publications | where: 'kind', 'paper' | where: 'region', 'domestic' %}
 {% assign phd = site.data.citations | where: 'kind', 'thesis' | where: 'degree', 'Ph.D.' %}
 {% assign ms = site.data.citations | where: 'kind', 'thesis' | where: 'degree', 'M.S.' %}
 <div class="publication-layout browse-layout">
