@@ -15,7 +15,7 @@
   const links = [...story.querySelectorAll('.story-steps a')];
   const panels = [...story.querySelectorAll('.signal-panel')];
   const traces = panels.map(panel => panel.querySelector('.signal-trace'));
-  const shortScreen = matchMedia('(max-height: 700px) and (max-width: 760px), (max-height: 650px)');
+  const sticky = story.querySelector('.story-sticky');
   const TAU = Math.PI * 2;
   const clamp = (x, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, x));
   const mix = (a, b, t) => a + (b - a) * t;
@@ -46,7 +46,7 @@
   ];
   let width = 700, height = 550, current = 0, target = 0, frame = 0;
   let active = -1, destinations = [], visible = true;
-  let geometryTop = 0, geometryRange = 1, headerHeight = 84;
+  let geometryTop = 0, geometryRange = 1;
   const samples = Array.from({ length: 1000 }, (_, i) => ({ angle: i * 2.3999632297, size: .42 + fract(i * .618) * .62 }));
 
   // Smooth periodic keyframes describe contact, push-off, recovery and landing.
@@ -495,18 +495,22 @@
   function tick() {
     frame = 0;
     if (!visible || document.hidden) return;
-    if (shortScreen.matches) current = target;
-    else current += (target - current) * .18;
+    current += (target - current) * .18;
     if (Math.abs(current - target) < .0004) current = target;
     render();
     if (current !== target) frame = requestAnimationFrame(tick);
   }
   function requestRender() { if (!frame && visible && !document.hidden) frame = requestAnimationFrame(tick); }
   function measure() {
-    headerHeight = document.querySelector('.site-header').getBoundingClientRect().height;
     const rect = story.getBoundingClientRect();
-    geometryTop = rect.top + scrollY - headerHeight;
-    geometryRange = Math.max(1, rect.height - (innerHeight - headerHeight));
+    // Short viewports pin the bottom of the stage while the introductory copy
+    // scrolls above it. Use the same sticky bounds for motion and scene links.
+    const headerHeight = document.querySelector('.site-header').getBoundingClientRect().height;
+    const stickyHeight = sticky.getBoundingClientRect().height;
+    const stickyTop = Math.min(headerHeight, innerHeight - stickyHeight);
+    sticky.style.setProperty('--story-top', `${stickyTop}px`);
+    geometryTop = rect.top + scrollY - stickyTop;
+    geometryRange = Math.max(1, rect.height - stickyHeight);
     const bounds = stage.getBoundingClientRect();
     const scale = bounds.width / 700;
     width = 700; height = bounds.height / scale;
@@ -517,22 +521,21 @@
     onScroll(); render();
   }
   function onScroll() {
-    if (!shortScreen.matches) target = clamp((scrollY - geometryTop) / geometryRange) * 4.999;
+    target = clamp((scrollY - geometryTop) / geometryRange) * 4.999;
     requestRender();
   }
   function selectScene(index, updateHistory = true) {
     const value = index + .20;
-    if (shortScreen.matches) { target = value; requestRender(); }
-    else window.scrollTo({ top: geometryTop + value / 4.999 * geometryRange, behavior: 'auto' });
+    window.scrollTo({ top: geometryTop + value / 4.999 * geometryRange, behavior: 'auto' });
     if (updateHistory) history.replaceState(null, '', links[index].getAttribute('href'));
   }
   links.forEach((link, index) => link.addEventListener('click', event => { event.preventDefault(); selectScene(index); }));
-  shortScreen.addEventListener('change', measure);
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', measure);
   document.addEventListener('visibilitychange', () => { if (document.hidden && frame) { cancelAnimationFrame(frame); frame = 0; } else requestRender(); });
   new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) { current = target; requestRender(); } else if (frame) { cancelAnimationFrame(frame); frame = 0; } }).observe(study);
   new ResizeObserver(measure).observe(stage);
+  new ResizeObserver(measure).observe(sticky);
   story.classList.add('is-enhanced'); study.classList.add('is-ready');
   measure();
   const hashIndex = links.findIndex(link => link.getAttribute('href') === location.hash);

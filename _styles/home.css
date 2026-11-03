@@ -17,8 +17,8 @@
 .chapter-equipment > span:last-child { margin-left: auto; font-size: 17px; }
 .chapter-equipment:hover { border-top-color: #fff; }
 .motion-story.is-enhanced { height: 650svh; }
-.is-enhanced .story-sticky { position: sticky; top: var(--header-height); height: calc(100svh - var(--header-height)); min-height: 530px; display: flex; flex-direction: column; }
-.is-enhanced .story-main { flex: 1; min-height: 0; width: 100%; }
+.is-enhanced .story-sticky { position: sticky; top: var(--story-top, var(--header-height)); min-height: max(530px, calc(100svh - var(--header-height))); display: flex; flex-direction: column; }
+.is-enhanced .story-main { flex: 1; width: 100%; }
 .is-enhanced .story-copy { display: grid; min-width: 0; padding: 25px 0; }
 .is-enhanced .story-chapter { grid-area: 1 / 1; opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(12px); transition: opacity .32s, transform .32s, visibility .32s; padding: 0; }
 .is-enhanced .story-chapter.is-active { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
@@ -90,7 +90,7 @@
   .story-topline { font-size: 10px; letter-spacing: .8px; }
   .story-topline > span:last-child { display: none; }
   .story-main { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
-  .is-enhanced .story-sticky { min-height: 615px; }
+  .is-enhanced .story-sticky { min-height: max(615px, calc(100svh - var(--header-height))); }
   .is-enhanced .story-copy { padding: 24px 0 13px; }
   .story-chapter h1, .story-chapter h2 { font-size: clamp(28px, 7vw, 34px); line-height: 1.04; margin-bottom: 12px; }
   .story-chapter h1 br, .story-chapter h2 br { display: none; }
@@ -137,11 +137,8 @@
   .chapter-detail { font-size: 14px; }
   .chapter-equipment { margin-top: 18px; padding-top: 15px; }
 }
-/* Short landscape screens use the same scene controls without a sticky scroll trap. */
+/* Keep the scroll-driven stage available in short windows and landscape screens. */
 @media (max-height: 700px) and (max-width: 760px), (max-height: 650px) {
-  .motion-story.is-enhanced { height: auto; }
-  .is-enhanced .story-sticky { position: relative; top: auto; height: auto; min-height: 0; }
-  .motion-stage { max-height: none; }
   .story-chapter h1, .story-chapter h2 { font-size: 34px; }
 }
 @media print { .motion-story.is-enhanced { height: auto; } .is-enhanced .story-sticky { position: relative; height: auto; } .is-enhanced .story-copy { display: block; } .is-enhanced .story-chapter { opacity: 1; visibility: visible; } .motion-study, .story-bottomline { display: none; } }
